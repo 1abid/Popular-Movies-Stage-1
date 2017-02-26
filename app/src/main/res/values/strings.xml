@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Popular Movies Stage one</string>
+
+    //bottom tab navigation menu string
+    <string name="menuMovie">Movie</string>
+    <string name="menuTvShow">Tv series</string>
+    <string name="menuSearch">Search</string>
+    <string name="menuProfile">Profile</string>
+
+    //MISC
+    <string name="ok_Button">OK</string>
+
+    //error msgs
+    <string name="no_userName">enter your TMDB user name</string>
+    <string name="wrong_pass_length">password length must be 4 to 10 alphanumeric characters</string>
+    <string name="log_failed">log in failed</string>
+    <string name="log_in_success">Successfully logged in</string>
+</resources>
