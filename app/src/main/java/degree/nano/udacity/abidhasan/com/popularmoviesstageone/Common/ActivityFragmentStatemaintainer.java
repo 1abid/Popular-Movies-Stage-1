@@ -9,56 +9,58 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
 /**
- * Created by abidhasan on 2/26/17.
+ * Created by VutkaBilai on 2/27/17.
+ * mail : la4508@gmail.com
  */
 
-public class StateMaintainer {
+public class ActivityFragmentStatemaintainer {
 
     protected final String TAG = getClass().getSimpleName();
 
-    private final String mStateMainterTag;
-    private final WeakReference<FragmentManager> mFragmentManager;
-    private StateMngFragment mStatemainterFrag;
+
+    private final String mStateMaintainerTag;
+    private final WeakReference<FragmentManager> mFragmentManeger;
+    private StateMngFragment mStateMaintainerFrag;
     private boolean isRecreating ;
 
 
-    public StateMaintainer(String mStateMainterTag, FragmentManager mFragmentManager) {
-        this.mStateMainterTag = mStateMainterTag;
-        this.mFragmentManager = new WeakReference<FragmentManager>(mFragmentManager);
+    public ActivityFragmentStatemaintainer( FragmentManager frgmentManager, String mStateMaintainerTag) {
+        this.mFragmentManeger = new WeakReference<FragmentManager>(frgmentManager);
+        this.mStateMaintainerTag = mStateMaintainerTag;
     }
+
 
 
     /**
      * Creates the Fragment responsible to maintain the objects.
      * @return  true: fragment just created
      */
-    public boolean firstTimeIn(){
+    public boolean isFirstTimeIn(){
 
-        try {
-            mStatemainterFrag = (StateMngFragment) mFragmentManager.get().findFragmentByTag(mStateMainterTag);
+        try{
+            mStateMaintainerFrag = (StateMngFragment) mFragmentManeger.get().findFragmentByTag(mStateMaintainerTag);
 
+            if(mStateMaintainerFrag == null){
 
-            if (mStatemainterFrag == null) {
-                Log.d(TAG, "no saved fragment found to retainted " + mStatemainterFrag);
-                mStatemainterFrag = new StateMngFragment();
-                mFragmentManager.get().beginTransaction().add(mStatemainterFrag, mStateMainterTag).commit();
-                isRecreating = false;
+                Log.d(TAG, "no saved fragment found to retainted " + mStateMaintainerFrag);
+                mStateMaintainerFrag = new StateMngFragment();
+
+                mFragmentManeger.get().beginTransaction().add(mStateMaintainerFrag , mStateMaintainerTag).commit();
+                isRecreating = false ;
 
                 return true;
-            } else {
-                Log.d(TAG, "saved fragment found , retaining fragment " + mStatemainterFrag);
+            }else {
+                Log.d(TAG, "saved fragment found , retaining fragment " + mStateMaintainerFrag);
                 isRecreating = true;
 
                 return false;
             }
         }catch (NullPointerException e){
-            Log.e(TAG , " error "+e.getMessage());
-            return false;
+            Log.e(TAG , "error "+e.getMessage());
+            return  false;
         }
 
-
     }
-
 
 
     /**
@@ -68,15 +70,15 @@ public class StateMaintainer {
     public boolean wasRecreated() { return isRecreating; }
 
 
-
     /**
      * Insert the object to be preserved.
      * @param key   object's TAG
      * @param obj   object to maintain
      */
     public void put(String key, Object obj) {
-        mStatemainterFrag.put(key, obj);
+        mStateMaintainerFrag.put(key, obj);
     }
+
 
     /**
      * Insert the object to be preserved.
@@ -86,7 +88,6 @@ public class StateMaintainer {
         put(obj.getClass().getName(), obj);
     }
 
-
     /**
      * Recovers the object saved
      * @param key   Object's TAG
@@ -95,7 +96,7 @@ public class StateMaintainer {
      */
     @SuppressWarnings("unchecked")
     public <T> T get(String key)  {
-        return mStatemainterFrag.get(key);
+        return mStateMaintainerFrag.get(key);
 
     }
 
@@ -105,8 +106,9 @@ public class StateMaintainer {
      * @return      true: Object exists
      */
     public boolean hasKey(String key) {
-        return mStatemainterFrag.get(key) != null;
+        return mStateMaintainerFrag.get(key) != null;
     }
+
 
 
 
@@ -116,7 +118,8 @@ public class StateMaintainer {
      */
     public static class StateMngFragment extends Fragment {
 
-        private HashMap<String , Object> mData = new HashMap<>();
+        private HashMap<String , Object> data = new HashMap<>();
+
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -128,34 +131,34 @@ public class StateMaintainer {
 
 
 
+
         /**
          * Insert objects on the hashmap
          * @param key   Reference key
          * @param obj   Object to be saved
          */
         public void put(String key , Object obj){
-            mData.put(key , obj);
+            data.put(key ,obj);
         }
 
-
         /**
-         * Insert objects on the hashmap
-         * @param object    Object to be saved
+         * Insert the object to be preserved.
+         * @param obj   object to maintain
          */
-        public void put(Object object) {
-            put(object.getClass().getName(), object);
+        public void put(Object obj) {
+            put(obj.getClass().getName(), obj);
         }
 
 
         /**
-         * Recovers saved object
-         * @param key   Reference key
+         * Recovers the object saved
+         * @param key   Object's TAG
          * @param <T>   Object type
          * @return      Object saved
          */
-        @SuppressWarnings("unchecked")
-        public <T> T get(String key) {
-            return (T) mData.get(key);
+
+        public <T> T get(String key){
+            return (T) data.get(key);
         }
     }
 }

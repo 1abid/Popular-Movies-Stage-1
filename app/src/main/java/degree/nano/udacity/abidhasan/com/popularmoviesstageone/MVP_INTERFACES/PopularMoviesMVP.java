@@ -3,7 +3,10 @@ package degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.v7.app.AlertDialog;
+import android.view.ViewGroup;
 import android.widget.Toast;
+
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.MovieViewHolder;
 
 /**
  * Created by abidhasan on 2/26/17.
@@ -41,6 +44,10 @@ public class PopularMoviesMVP {
         void onDestroy(boolean isChangingConfigurations);
         void setView(RequiredViewOps view);
 
+        MovieViewHolder createViewHolder(ViewGroup parent , int viewType);
+        void bindViewHolder(MovieViewHolder holder , int position);
+        int getItemCount();
+
         ProgressDialog createProgressDialog();
         void setProgressDialogMsg(String msg , ProgressDialog progressDialog);
         void loadPopularMovies();
@@ -55,7 +62,8 @@ public class PopularMoviesMVP {
      * to model (model -> presenter)
      */
     public interface RequiredPresenterOps{
-
+        Context getAppContext();
+        Context getActivityContext();
     }
 
     /**
@@ -65,5 +73,11 @@ public class PopularMoviesMVP {
      */
     public interface ProvidedModelOps{
 
+        void onDestroy(boolean isConfigurationChanging);
+        void loadPopularMovies();
+        void loadTopRatedMovies();
+
+        int getPopularMoviesListSize();
+        int getTopRatedMoviesListSize();
     }
 }
