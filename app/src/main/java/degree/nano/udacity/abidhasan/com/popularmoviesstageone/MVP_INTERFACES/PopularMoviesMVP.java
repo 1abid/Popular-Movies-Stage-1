@@ -3,9 +3,13 @@ package degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import java.util.List;
+
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.MovieViewHolder;
 
 /**
@@ -30,6 +34,8 @@ public class PopularMoviesMVP {
         void hideProgressDialog();
         void showToast(Toast toast);
         void showAlert(AlertDialog alertDialog);
+
+        RecyclerView getRecyclrView();
     }
 
 
@@ -79,5 +85,8 @@ public class PopularMoviesMVP {
 
         int getPopularMoviesListSize();
         int getTopRatedMoviesListSize();
+
+        List<MovieGridItem> generatePopularMovieGridItems();
+        List<MovieGridItem> generateTopRatedMovieGridItems();
     }
 }

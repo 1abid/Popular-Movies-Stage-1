@@ -35,6 +35,17 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
         setUpViews();
 
+        showPopularMovies();
+
+    }
+
+
+    /**
+     * tells presenter
+     * to load popularmoies
+     */
+    private void showPopularMovies() {
+        mPresenter.loadPopularMovies();
     }
 
 
@@ -44,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
         setUpMvp();
 
         if(pDailog == null)
-            mPresenter.createProgressDialog();
+            pDailog = mPresenter.createProgressDialog();
     }
 
     @Override
@@ -121,5 +132,10 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     @Override
     public void showAlert(AlertDialog alertDialog) {
         alertDialog.show();
+    }
+
+    @Override
+    public RecyclerView getRecyclrView() {
+        return movieRecyclerView;
     }
 }

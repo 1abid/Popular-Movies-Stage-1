@@ -14,9 +14,9 @@ import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
 
 public class MovieViewHolder extends RecyclerView.ViewHolder{
 
-    private RelativeLayout container;
-    private TextView movietile , movieReleaseDate , movieRating ;
-    private ImageView moviePosterIv;
+    public RelativeLayout container;
+    public TextView movietile , movieReleaseDate , movieRating ;
+    public ImageView moviePosterIv;
 
 
     public MovieViewHolder(View itemView) {

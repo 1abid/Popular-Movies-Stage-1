@@ -11,39 +11,55 @@ public class MovieGridItem {
     private String movieAvg_vote ;
     private String movieName ;
     private String movieReleaseDate ;
-    private String movieLength;
-    private String MoviewGenere;
-    private String movieBackDroppath;
+    private String movieTitle;
+    private String movieBackDropPath;
     private String moviePosterPath;
 
-    public MovieGridItem(String movieAvg_vote, String movieBackDroppath,
-                         int movieId, String movieLength, String movieName,
-                         String moviePosterPath, String movieReleaseDate, String moviewGenere) {
-        this.movieAvg_vote = movieAvg_vote;
-        this.movieBackDroppath = movieBackDroppath;
-        this.movieId = movieId;
-        this.movieLength = movieLength;
-        this.movieName = movieName;
-        this.moviePosterPath = moviePosterPath;
-        this.movieReleaseDate = movieReleaseDate;
-        MoviewGenere = moviewGenere;
+    public MovieGridItem() {
     }
 
+    public void setMovieId(int movieId) {
+        this.movieId = movieId;
+    }
+
+    public void setMovieAvg_vote(String movieAvg_vote) {
+        this.movieAvg_vote = movieAvg_vote;
+    }
+
+    public void setMovieName(String movieName) {
+        this.movieName = movieName;
+    }
+
+    public void setMovieReleaseDate(String movieReleaseDate) {
+        this.movieReleaseDate = movieReleaseDate;
+    }
+
+    public String getMovieTitle() {
+        return movieTitle;
+    }
+
+    public void setMovieTitle(String movieTitle) {
+        this.movieTitle = movieTitle;
+    }
+
+    public void setMovieBackDropPath(String movieBackDropPath) {
+        this.movieBackDropPath = movieBackDropPath;
+    }
+
+    public void setMoviePosterPath(String moviePosterPath) {
+        this.moviePosterPath = moviePosterPath;
+    }
 
     public String getMovieAvg_vote() {
         return movieAvg_vote;
     }
 
-    public String getMovieBackDroppath() {
-        return movieBackDroppath;
+    public String getMovieBackDropPath() {
+        return movieBackDropPath;
     }
 
     public int getMovieId() {
         return movieId;
-    }
-
-    public String getMovieLength() {
-        return movieLength;
     }
 
     public String getMovieName() {
@@ -56,9 +72,5 @@ public class MovieGridItem {
 
     public String getMovieReleaseDate() {
         return movieReleaseDate;
-    }
-
-    public String getMoviewGenere() {
-        return MoviewGenere;
     }
 }
