@@ -7,6 +7,8 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -91,6 +93,14 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         mView = new WeakReference<PopularMoviesMVP.RequiredViewOps>(view);
     }
 
+    @Override
+    public boolean onCreateOptionMenu(Menu menu) {
+        MenuInflater inflater = new MenuInflater(getActivityContext());
+        inflater.inflate(R.menu.main_menu , menu);
+
+        return true;
+    }
+
     /**
      * show progressDialog
      * for showing network
@@ -99,7 +109,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     @Override
     public ProgressDialog createProgressDialog() {
 
-        final ProgressDialog pDialog = new ProgressDialog(getView().getActivityContext()
+        ProgressDialog pDialog = new ProgressDialog(getView().getActivityContext()
                 , R.style.AppTheme_Dark_Dialog);
 
         pDialog.setIndeterminate(true);

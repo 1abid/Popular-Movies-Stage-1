@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/popular_movies"
+        app:showAsAction="ifRoom|withText"
+        android:title="Popular Movies"></item>
+    <item
+        android:id="@+id/toprated_movies"
+        app:showAsAction="ifRoom|withText"
+        android:title="Top Movies"></item>
+</menu>

@@ -6,6 +6,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.widget.Toast;
 
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ActivityFragmentStatemaintainer;
@@ -19,7 +21,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     private PopularMoviesMVP.ProvidedPresenterOps mPresenter;
     private RecyclerView movieRecyclerView;
     private ProgressDialog pDailog;
-
+    private Toolbar mToolbar ;
 
     // Responsible to maintain the object's integrity
     // during configurations change
@@ -50,18 +52,28 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
 
     private void setUpViews() {
+
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
         movieRecyclerView = (RecyclerView) findViewById(R.id.rvMovies);
 
         setUpMvp();
 
         if(pDailog == null)
             pDailog = mPresenter.createProgressDialog();
+
+        if(mToolbar != null)
+            setSupportActionBar(mToolbar);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mPresenter.onDestroy(isChangingConfigurations());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return  mPresenter.onCreateOptionMenu(menu) ;
     }
 
     /**

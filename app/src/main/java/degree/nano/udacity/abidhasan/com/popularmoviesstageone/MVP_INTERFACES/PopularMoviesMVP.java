@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
@@ -49,6 +50,7 @@ public class PopularMoviesMVP {
 
         void onDestroy(boolean isChangingConfigurations);
         void setView(RequiredViewOps view);
+        boolean onCreateOptionMenu(Menu menu);
 
         MovieViewHolder createViewHolder(ViewGroup parent , int viewType);
         void bindViewHolder(MovieViewHolder holder , int position);
