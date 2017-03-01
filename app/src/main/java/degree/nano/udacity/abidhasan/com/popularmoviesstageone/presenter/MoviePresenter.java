@@ -277,26 +277,45 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     public void bindViewHolder(MovieViewHolder holder, int position) {
 
         MovieGridItem movieItem;
-        if (isPopularSelected)
+        if (isPopularSelected){
+
             movieItem = mPopularMovies.get(position);
-        else
+            holder.movietile.setText(movieItem.getMovieName());
+            holder.movieReleaseDate.setText(movieItem.getMovieReleaseDate());
+            holder.movieRating.setText(movieItem.getMovieAvg_vote());
+
+            ViewTarget target = new ViewTarget<ImageView, GlideDrawable>(holder.moviePosterIv) {
+
+                @Override
+                public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                    this.view.setImageDrawable(resource.getCurrent());
+                }
+            };
+
+            Glide.with(getView().getAppContext())
+                    .load(API_URLS.IMAGE_PATH + movieItem.getMoviePosterPath()).crossFade().fitCenter()
+                    .into(target);
+        }else {
             movieItem = mTopRatedMovies.get(position);
 
-        holder.movietile.setText(movieItem.getMovieName());
-        holder.movieReleaseDate.setText(movieItem.getMovieReleaseDate());
-        holder.movieRating.setText(movieItem.getMovieAvg_vote());
+            holder.movietile.setText(movieItem.getMovieName());
+            holder.movieReleaseDate.setText(movieItem.getMovieReleaseDate());
+            holder.movieRating.setText(movieItem.getMovieAvg_vote());
 
-        ViewTarget target = new ViewTarget<ImageView, GlideDrawable>(holder.moviePosterIv) {
+            ViewTarget target = new ViewTarget<ImageView, GlideDrawable>(holder.moviePosterIv) {
 
-            @Override
-            public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
-                this.view.setImageDrawable(resource.getCurrent());
-            }
-        };
+                @Override
+                public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                    this.view.setImageDrawable(resource.getCurrent());
+                }
+            };
 
-        Glide.with(getView().getAppContext())
-                .load(API_URLS.IMAGE_PATH + movieItem.getMoviePosterPath()).crossFade().fitCenter()
-                .into(target);
+            Glide.with(getView().getAppContext())
+                    .load(API_URLS.IMAGE_PATH + movieItem.getMoviePosterPath()).crossFade().fitCenter()
+                    .into(target);
+        }
+
+
 
     }
 
