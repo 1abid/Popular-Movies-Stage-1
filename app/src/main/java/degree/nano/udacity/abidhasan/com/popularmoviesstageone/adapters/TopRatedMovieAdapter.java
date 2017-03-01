@@ -7,30 +7,30 @@ import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.Po
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.MovieViewHolder;
 
 /**
- * Created by VutkaBilai on 2/27/17.
+ * Created by VutkaBilai on 3/1/17.
  * mail : la4508@gmail.com
  */
 
-public class PopularMovieadpter extends RecyclerView.Adapter<MovieViewHolder> {
+public class TopRatedMovieAdapter extends RecyclerView.Adapter<MovieViewHolder> {
 
     private PopularMoviesMVP.ProvidedPresenterOps mPresenter;
 
-    public PopularMovieadpter(PopularMoviesMVP.ProvidedPresenterOps mPresenter) {
+    public TopRatedMovieAdapter(PopularMoviesMVP.ProvidedPresenterOps mPresenter) {
         this.mPresenter = mPresenter;
     }
 
     @Override
     public MovieViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return mPresenter.createPopularViewHolder(parent , viewType);
+        return mPresenter.createTopMovieViewHolder(parent , viewType);
     }
 
     @Override
     public void onBindViewHolder(MovieViewHolder holder, int position) {
-        mPresenter.bindPopularViewHolder(holder , position);
+        mPresenter.bindTopMovieViewHolder(holder , position);
     }
 
     @Override
     public int getItemCount() {
-        return mPresenter.getPopularItemCount();
+        return mPresenter.getTopItemCount();
     }
 }

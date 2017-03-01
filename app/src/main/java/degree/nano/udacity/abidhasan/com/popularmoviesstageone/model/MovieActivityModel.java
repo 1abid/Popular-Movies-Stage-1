@@ -56,7 +56,7 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
     @Override
     public void loadPopularMovies() {
 
-        moviePresenter.setProgressDialogMsg("Loading Popular movies... " , moviePresenter.getView().getProgressDialog());
+        moviePresenter.setProgressDialogMsg("Loading... " , moviePresenter.getView().getProgressDialog());
         moviePresenter.getView().showProgressDialog();
 
         TmdbApiInterface apiInterface = RestServiceGenerator.createService(TmdbApiInterface.class);
@@ -91,7 +91,7 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
     public void loadTopRatedMovies() {
 
 
-        moviePresenter.setProgressDialogMsg("Loading Top Rated movies... " , moviePresenter.getView().getProgressDialog());
+        moviePresenter.setProgressDialogMsg("Loading... " , moviePresenter.getView().getProgressDialog());
         moviePresenter.getView().showProgressDialog();
 
         TmdbApiInterface apiInterface = RestServiceGenerator.createService(TmdbApiInterface.class);
