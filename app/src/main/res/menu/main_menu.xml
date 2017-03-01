@@ -4,9 +4,9 @@
     <item
         android:id="@+id/popular_movies"
         app:showAsAction="ifRoom|withText"
-        android:title="Popular Movies"></item>
+        android:title="@string/menu_popular"></item>
     <item
         android:id="@+id/toprated_movies"
         app:showAsAction="ifRoom|withText"
-        android:title="Top Movies"></item>
+        android:title="@string/menu_toprated"></item>
 </menu>

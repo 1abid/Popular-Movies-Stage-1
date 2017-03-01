@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ActivityFragmentStatemaintainer;
@@ -21,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     private PopularMoviesMVP.ProvidedPresenterOps mPresenter;
     private RecyclerView movieRecyclerView;
     private ProgressDialog pDailog;
-    private Toolbar mToolbar ;
+    private Toolbar mToolbar;
 
     // Responsible to maintain the object's integrity
     // during configurations change
@@ -58,10 +60,10 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
         setUpMvp();
 
-        if(pDailog == null)
+        if (pDailog == null)
             pDailog = mPresenter.createProgressDialog();
 
-        if(mToolbar != null)
+        if (mToolbar != null)
             setSupportActionBar(mToolbar);
     }
 
@@ -73,7 +75,24 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        return  mPresenter.onCreateOptionMenu(menu) ;
+        return mPresenter.onCreateOptionMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+
+        switch (item.getItemId()) {
+            case R.id.popular_movies:
+                mPresenter.popularMoviesSelected();
+
+            case R.id.toprated_movies:
+                mPresenter.topRatedMoviesSelected();
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
     }
 
     /**
@@ -83,9 +102,9 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
      * Could be done differently,
      * using a dependency injection for example.
      */
-    private void setUpMvp(){
+    private void setUpMvp() {
 
-        if(mStateMaintainer.isFirstTimeIn()){
+        if (mStateMaintainer.isFirstTimeIn()) {
 
             //create the presenter
             MoviePresenter presenter = new MoviePresenter(this);
@@ -103,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
             //set the presenter as a interface
             //to limit communication with it
-            mPresenter = presenter ;
+            mPresenter = presenter;
         }
     }
 

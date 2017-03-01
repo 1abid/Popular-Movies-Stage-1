@@ -1,16 +1,16 @@
 package degree.nano.udacity.abidhasan.com.popularmoviesstageone.model;
 
-import android.widget.Toast;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Application.RestServiceGenerator;
-import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ToastMaker;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.PopularMoviesMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.Movie;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.PopularMovieResponse;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.TopRatedMovieResponse;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.presenter.MoviePresenter;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.rest.TmdbApiInterface;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.util.API_URLS;
@@ -29,7 +29,8 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
     private PopularMoviesMVP.RequiredPresenterOps mPresenter ;
     private MoviePresenter moviePresenter ;
 
-    private List<MovieGridItem> movieGridItems ;
+    private List<MovieGridItem> popularMovieGridItems;
+    private List<MovieGridItem> topRatedMoviesGridItems;
     private List<Movie> popularMovies ;
     private List<Movie> topRatedMovies ;
 
@@ -39,7 +40,9 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
 
         moviePresenter = (MoviePresenter) mPresenter;
 
-        movieGridItems = new ArrayList<>() ;
+        popularMovieGridItems = new ArrayList<>() ;
+        topRatedMoviesGridItems = new ArrayList<>();
+
         popularMovies = new ArrayList<>() ;
         topRatedMovies = new ArrayList<>() ;
     }
@@ -71,10 +74,6 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
 
                     popularMovies = response.body().getResults();
 
-                    Toast toast = ToastMaker.makeToast(mPresenter.getActivityContext() ,
-                            "result found : "+ popularMovies.size());
-
-                    moviePresenter.getView().showToast(toast);
                     moviePresenter.showPopularMovies();
                 }
             }
@@ -82,6 +81,8 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
             @Override
             public void onFailure(Call<PopularMovieResponse> call, Throwable t) {
 
+                moviePresenter.getView().hideProgressDialog();
+                Log.d("ERROR : ","something went wrong .... "+t.getMessage());
             }
         });
     }
@@ -89,6 +90,36 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
     @Override
     public void loadTopRatedMovies() {
 
+
+        moviePresenter.setProgressDialogMsg("Loading Top Rated movies... " , moviePresenter.getView().getProgressDialog());
+        moviePresenter.getView().showProgressDialog();
+
+        TmdbApiInterface apiInterface = RestServiceGenerator.createService(TmdbApiInterface.class);
+
+        Call<TopRatedMovieResponse> call = apiInterface.getTopratedMovies(API_URLS.TMDB_API_KEY);
+
+        call.enqueue(new Callback<TopRatedMovieResponse>() {
+
+            @Override
+            public void onResponse(Call<TopRatedMovieResponse> call, Response<TopRatedMovieResponse> response) {
+
+                if(response.isSuccessful()){
+
+                    moviePresenter.getView().hideProgressDialog();
+
+                    topRatedMovies = response.body().getResults();
+
+                    moviePresenter.showTopRatedMovies();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TopRatedMovieResponse> call, Throwable t) {
+
+                moviePresenter.getView().hideProgressDialog();
+                Log.d("ERROR : ","something went wrong .... "+t.getMessage());
+            }
+        });
     }
 
     @Override
@@ -101,6 +132,12 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
         return (topRatedMovies == null ) ? 0 : topRatedMovies.size();
     }
 
+
+    /**
+     * generate popular movie grid item
+     * from popular movieList
+     * @return
+     */
     @Override
     public List<MovieGridItem> generatePopularMovieGridItems() {
 
@@ -123,15 +160,44 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
             item.setMoviePosterPath(posterPath);
             item.setMovieTitle(movieTitle);
 
-            movieGridItems.add(item);
+            popularMovieGridItems.add(item);
 
         }
 
-        return movieGridItems;
+        return popularMovieGridItems;
     }
 
+    /**
+     * generate toprated movie grid item
+     * from toprated movieList
+     * @return
+     */
     @Override
     public List<MovieGridItem> generateTopRatedMovieGridItems() {
-        return null;
+
+        for (Movie movie : topRatedMovies) {
+
+            MovieGridItem item = new MovieGridItem() ;
+            int movieId = movie.getId();
+            String movieName = movie.getMovieTitle();
+            String movieTitle = movie.getMovieTitleOriginal();
+            String movieVote = String.valueOf(movie.getVoteAvg());
+            String releaseDate = movie.getReleaseDate();
+            String backDropPath = movie.getBackdropPath();
+            String posterPath = movie.getPosterPath();
+
+            item.setMovieId(movieId);
+            item.setMovieName(movieName);
+            item.setMovieAvg_vote(movieVote);
+            item.setMovieReleaseDate(releaseDate);
+            item.setMovieBackDropPath(backDropPath);
+            item.setMoviePosterPath(posterPath);
+            item.setMovieTitle(movieTitle);
+
+            topRatedMoviesGridItems.add(item);
+
+        }
+
+        return topRatedMoviesGridItems;
     }
 }

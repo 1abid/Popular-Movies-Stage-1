@@ -22,6 +22,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ToastMaker;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.PopularMoviesMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.adapters.PopularMovieadpter;
@@ -50,6 +51,11 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     private List<MovieGridItem> mPopularMovies;
     private List<MovieGridItem> mTopRatedMovies;
 
+    private static final int FLAG_POPULAR_SELECTED = 1;
+    private static final int FLAG_TOPRATED_SELECTED = 2;
+
+    private boolean isPopularSelected = true;
+
     public MoviePresenter(PopularMoviesMVP.RequiredViewOps mView) {
         this.mView = new WeakReference<PopularMoviesMVP.RequiredViewOps>(mView);
 
@@ -61,10 +67,11 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     /**
      * called by activity every time during
      * setting up MVP , only called once
+     *
      * @param model
      */
-    public void setModel(PopularMoviesMVP.ProvidedModelOps model){
-        this.mModel = model ;
+    public void setModel(PopularMoviesMVP.ProvidedModelOps model) {
+        this.mModel = model;
     }
 
 
@@ -78,14 +85,15 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         mModel.onDestroy(isChangingConfigurations);
 
         //activity destroyed
-        if(!isChangingConfigurations){
-            mModel = null ;
+        if (!isChangingConfigurations) {
+            mModel = null;
         }
     }
 
     /**
      * called by {@link MainActivity}
      * during the reconstruction event
+     *
      * @param view
      */
     @Override
@@ -95,11 +103,32 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
     @Override
     public boolean onCreateOptionMenu(Menu menu) {
+
         MenuInflater inflater = new MenuInflater(getActivityContext());
-        inflater.inflate(R.menu.main_menu , menu);
+        inflater.inflate(R.menu.main_menu, menu);
 
         return true;
     }
+
+    @Override
+    public void popularMoviesSelected() {
+
+        isPopularSelected = true;
+        loadPopularMovies();
+
+    }
+
+
+
+    @Override
+    public void topRatedMoviesSelected() {
+
+        isPopularSelected = false;
+        loadTopRatedMovies();
+
+     }
+
+
 
     /**
      * show progressDialog
@@ -113,6 +142,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
                 , R.style.AppTheme_Dark_Dialog);
 
         pDialog.setIndeterminate(true);
+        pDialog.setCancelable(false);
 
         return pDialog;
     }
@@ -125,7 +155,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     @Override
     public void loadPopularMovies() {
 
-        if(mPopularMovies.size() == 0)
+        if (mPopularMovies.size() == 0)
             mModel.loadPopularMovies();
         else
             showPopularMovies();
@@ -134,25 +164,54 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     @Override
     public void loadTopRatedMovies() {
 
+        if(mTopRatedMovies.size() == 0)
+            mModel.loadTopRatedMovies();
+        else
+            showTopRatedMovies();
     }
 
 
-    public void showPopularMovies(){
-        movieRV = getView().getRecyclrView();
+    public void showPopularMovies() {
 
-        GridLayoutManager mLayoutManager = new GridLayoutManager(getActivityContext() , 2);
-        movieRV.setLayoutManager(mLayoutManager);
+        if(movieRV == null) {
+            movieRV = getView().getRecyclrView();
 
-        int spacingInPixels = getAppContext().getResources().getDimensionPixelSize(R.dimen.grid_item_space);
-        movieRV.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));
+            GridLayoutManager mLayoutManager = new GridLayoutManager(getActivityContext(), 2);
+            movieRV.setLayoutManager(mLayoutManager);
 
-        if(mPopularMovies.size() == 0)
+            int spacingInPixels = getAppContext().getResources().getDimensionPixelSize(R.dimen.grid_item_space);
+            movieRV.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));
+        }
+
+
+        if (mPopularMovies.size() == 0)
             addPopularMovieGriditem();
 
         popularMovieadpter = new PopularMovieadpter(this);
 
         movieRV.setAdapter(popularMovieadpter);
+    }
 
+
+    public void showTopRatedMovies() {
+
+
+        if (mTopRatedMovies.size() == 0)
+            addTopRatedMoviesGridItem();
+
+        popularMovieadpter = new PopularMovieadpter(this);
+        movieRV.setAdapter(popularMovieadpter);
+    }
+
+    /**
+     * add top rated Movies grid
+     * to the list
+     */
+    private void addTopRatedMoviesGridItem() {
+
+        for (MovieGridItem item : getTopratedMovies()) {
+            mTopRatedMovies.add(item);
+        }
     }
 
 
@@ -162,13 +221,17 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
      */
     private void addPopularMovieGriditem() {
 
-        for (MovieGridItem item: getPopularMovies()) {
+        for (MovieGridItem item : getPopularMovies()) {
             mPopularMovies.add(item);
         }
     }
 
-    private List<MovieGridItem> getPopularMovies(){
-       return mModel.generatePopularMovieGridItems();
+    private List<MovieGridItem> getPopularMovies() {
+        return mModel.generatePopularMovieGridItems();
+    }
+
+    private List<MovieGridItem> getTopratedMovies() {
+        return mModel.generateTopRatedMovieGridItems();
     }
 
     @Override
@@ -204,7 +267,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         MovieViewHolder viewHolder;
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
-        View movieItem =inflater.inflate(R.layout.movie_item ,parent , false);
+        View movieItem = inflater.inflate(R.layout.movie_item, parent, false);
         viewHolder = new MovieViewHolder(movieItem);
 
         return viewHolder;
@@ -213,13 +276,17 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     @Override
     public void bindViewHolder(MovieViewHolder holder, int position) {
 
-        final MovieGridItem movieItem = mPopularMovies.get(position);
+        MovieGridItem movieItem;
+        if (isPopularSelected)
+            movieItem = mPopularMovies.get(position);
+        else
+            movieItem = mTopRatedMovies.get(position);
 
         holder.movietile.setText(movieItem.getMovieName());
         holder.movieReleaseDate.setText(movieItem.getMovieReleaseDate());
         holder.movieRating.setText(movieItem.getMovieAvg_vote());
 
-        ViewTarget target = new ViewTarget<ImageView, GlideDrawable>(holder.moviePosterIv){
+        ViewTarget target = new ViewTarget<ImageView, GlideDrawable>(holder.moviePosterIv) {
 
             @Override
             public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
@@ -235,7 +302,10 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
     @Override
     public int getItemCount() {
-        return mPopularMovies.size();
+        if (isPopularSelected)
+            return mPopularMovies.size();
+        else
+            return mTopRatedMovies.size();
     }
 
     /**
@@ -246,10 +316,10 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
      * @return {@link PopularMoviesMVP.RequiredViewOps}
      * @throws NullPointerException
      */
-    public PopularMoviesMVP.RequiredViewOps getView() throws NullPointerException{
+    public PopularMoviesMVP.RequiredViewOps getView() throws NullPointerException {
 
-        if(mView != null)
-            return mView.get() ;
+        if (mView != null)
+            return mView.get();
         else
             throw new NullPointerException("view is unavailable");
     }

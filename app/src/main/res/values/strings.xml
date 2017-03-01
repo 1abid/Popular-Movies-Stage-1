@@ -10,6 +10,9 @@
     //MISC
     <string name="ok_Button">OK</string>
 
+    <string name="menu_popular">Popular movies</string>
+    <string name="menu_toprated">TopRated movies</string>
+
     //error msgs
     <string name="no_userName">enter your TMDB user name</string>
     <string name="wrong_pass_length">password length must be 4 to 10 alphanumeric characters</string>
