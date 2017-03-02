@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -28,6 +29,7 @@ import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.Po
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.adapters.PopularMovieadpter;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.adapters.TopRatedMovieAdapter;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.interfaces.OnItemClickListener;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.util.API_URLS;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.util.GridSpacingItemDecoration;
@@ -185,6 +187,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
         movieRV.setAdapter(popularMovieadpter);
         popularMovieadpter.notifyDataSetChanged();
+
     }
 
 
@@ -292,7 +295,13 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
                 .load(API_URLS.IMAGE_PATH + movieItem.getMoviePosterPath()).crossFade().fitCenter()
                 .into(target);
 
-
+        holder.setListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(View itemView, int position) {
+                String movieName = mPopularMovies.get(position).getMovieName();
+                getView().showToast(ToastMaker.makeToast(getActivityContext() , movieName));
+            }
+        });
     }
 
     @Override
@@ -332,6 +341,14 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         Glide.with(getView().getAppContext())
                 .load(API_URLS.IMAGE_PATH + movieItem.getMoviePosterPath()).crossFade().fitCenter()
                 .into(target);
+
+        holder.setListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(View itemView, int position) {
+                String movieName = mTopRatedMovies.get(position).getMovieName();
+                getView().showToast(ToastMaker.makeToast(getActivityContext() , movieName));
+            }
+        });
     }
 
     @Override
