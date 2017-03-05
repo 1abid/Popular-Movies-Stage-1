@@ -2,8 +2,6 @@ package degree.nano.udacity.abidhasan.com.popularmoviesstageone.presenter;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,7 +11,6 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -27,7 +24,7 @@ import java.util.List;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ToastMaker;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.PopularMoviesMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
-import degree.nano.udacity.abidhasan.com.popularmoviesstageone.adapters.PopularMovieadpter;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.adapters.PopularMovieAdapter;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.adapters.TopRatedMovieAdapter;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.interfaces.OnItemClickListener;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
@@ -49,12 +46,14 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     //model reference
     private PopularMoviesMVP.ProvidedModelOps mModel;
 
-    private PopularMovieadpter popularMovieadpter;
+    private PopularMovieAdapter popularMovieadpter;
     private TopRatedMovieAdapter topRatedMovieAdapter;
     private RecyclerView movieRV;
 
     private List<MovieGridItem> mPopularMovies;
     private List<MovieGridItem> mTopRatedMovies;
+
+    private boolean isPopularSelected = true;
 
     public MoviePresenter(PopularMoviesMVP.RequiredViewOps mView) {
         this.mView = new WeakReference<PopularMoviesMVP.RequiredViewOps>(mView);
@@ -112,17 +111,15 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
     @Override
     public void popularMoviesSelected() {
-
-        mModel.loadPopularMovies();
-
+        if (isPopularSelected())
+            mModel.loadPopularMovies();
     }
 
 
     @Override
     public void topRatedMoviesSelected() {
-
-        mModel.loadTopRatedMovies();
-
+        if (!isPopularSelected())
+            mModel.loadTopRatedMovies();
     }
 
 
@@ -183,11 +180,9 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         if (mPopularMovies.size() == 0)
             addPopularMovieGriditem();
 
-        popularMovieadpter = new PopularMovieadpter(this);
-
+        popularMovieadpter = new PopularMovieAdapter(this);
         movieRV.setAdapter(popularMovieadpter);
         popularMovieadpter.notifyDataSetChanged();
-
     }
 
 
@@ -198,9 +193,8 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
             addTopRatedMoviesGridItem();
 
         topRatedMovieAdapter = new TopRatedMovieAdapter(this);
-        movieRV.setAdapter(topRatedMovieAdapter);
-
-        popularMovieadpter.notifyDataSetChanged();
+        movieRV.swapAdapter(topRatedMovieAdapter,true);
+        topRatedMovieAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -224,6 +218,9 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         for (MovieGridItem item : getPopularMovies()) {
             mPopularMovies.add(item);
         }
+
+        Log.d(getClass().getSimpleName(), "popularMovies list " + mPopularMovies.size()
+                + " isSelectedPopular " + isPopularSelected());
     }
 
     private List<MovieGridItem> getPopularMovies() {
@@ -276,32 +273,9 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     @Override
     public void bindPopularViewHolder(MovieViewHolder holder, int position) {
 
-
         MovieGridItem movieItem = mPopularMovies.get(position);
+        bindMovieData(holder, movieItem);
 
-        holder.movietile.setText(movieItem.getMovieName());
-        holder.movieReleaseDate.setText(movieItem.getMovieReleaseDate());
-        holder.movieRating.setText(movieItem.getMovieAvg_vote());
-
-        ViewTarget target = new ViewTarget<ImageView, GlideDrawable>(holder.moviePosterIv) {
-
-            @Override
-            public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
-                this.view.setImageDrawable(resource.getCurrent());
-            }
-        };
-
-        Glide.with(getView().getAppContext())
-                .load(API_URLS.IMAGE_PATH + movieItem.getMoviePosterPath()).crossFade().fitCenter()
-                .into(target);
-
-        holder.setListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(View itemView, int position) {
-                String movieName = mPopularMovies.get(position).getMovieName();
-                getView().showToast(ToastMaker.makeToast(getActivityContext() , movieName));
-            }
-        });
     }
 
     @Override
@@ -310,7 +284,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     }
 
     @Override
-    public MovieViewHolder createTopMovieViewHolder(ViewGroup parent, int viewType) {
+    public MovieViewHolder createTopRatedViewHolder(ViewGroup parent, int viewType) {
 
         MovieViewHolder viewHolder;
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
@@ -322,39 +296,17 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     }
 
     @Override
-    public void bindTopMovieViewHolder(MovieViewHolder holder, int position) {
-
+    public void bindTopratedViewHolder(MovieViewHolder holder, int position) {
         MovieGridItem movieItem = mTopRatedMovies.get(position);
+        bindMovieData(holder, movieItem);
 
-        holder.movietile.setText(movieItem.getMovieName());
-        holder.movieReleaseDate.setText(movieItem.getMovieReleaseDate());
-        holder.movieRating.setText(movieItem.getMovieAvg_vote());
-
-        ViewTarget target = new ViewTarget<ImageView, GlideDrawable>(holder.moviePosterIv) {
-
-            @Override
-            public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
-                this.view.setImageDrawable(resource.getCurrent());
-            }
-        };
-
-        Glide.with(getView().getAppContext())
-                .load(API_URLS.IMAGE_PATH + movieItem.getMoviePosterPath()).crossFade().fitCenter()
-                .into(target);
-
-        holder.setListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(View itemView, int position) {
-                String movieName = mTopRatedMovies.get(position).getMovieName();
-                getView().showToast(ToastMaker.makeToast(getActivityContext() , movieName));
-            }
-        });
     }
 
     @Override
-    public int getTopItemCount() {
+    public int getTopRatedItemCount() {
         return mTopRatedMovies.size();
     }
+
 
     /**
      * return the view reference.
@@ -373,5 +325,41 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
             throw new NullPointerException("view is unavailable");
     }
 
+    private void bindMovieData(MovieViewHolder holder, final MovieGridItem item) {
 
+        holder.movietile.setText(item.getMovieName());
+        holder.movieReleaseDate.setText(item.getMovieReleaseDate());
+        holder.movieRating.setText(item.getMovieAvg_vote());
+
+        ViewTarget target = new ViewTarget<ImageView, GlideDrawable>(holder.moviePosterIv) {
+
+            @Override
+            public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                this.view.setImageDrawable(resource.getCurrent());
+            }
+        };
+
+        Glide.with(getView().getAppContext())
+                .load(API_URLS.IMAGE_PATH + item.getMoviePosterPath()).crossFade().fitCenter()
+                .into(target);
+
+        holder.setListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(View itemView, int position) {
+                String movieName = item.getMovieName();
+                getView().showToast(ToastMaker.makeToast(getActivityContext(), movieName));
+            }
+        });
+
+    }
+
+    @Override
+    public boolean isPopularSelected() {
+        return isPopularSelected;
+    }
+
+    @Override
+    public void setPopularSelected(boolean popularSelected) {
+        isPopularSelected = popularSelected;
+    }
 }
