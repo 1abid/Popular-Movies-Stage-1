@@ -31,6 +31,7 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
 
     private List<MovieGridItem> popularMovieGridItems;
     private List<MovieGridItem> topRatedMoviesGridItems;
+
     private List<Movie> popularMovies ;
     private List<Movie> topRatedMovies ;
 

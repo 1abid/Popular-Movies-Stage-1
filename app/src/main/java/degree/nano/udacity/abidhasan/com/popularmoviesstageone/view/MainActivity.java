@@ -65,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
         if (mToolbar != null)
             setSupportActionBar(mToolbar);
+
+
     }
 
     @Override
@@ -84,9 +86,13 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
         switch (item.getItemId()) {
             case R.id.popular_movies:
+                mPresenter.setPopularSelected(true);
+                mToolbar.setTitle(R.string.menu_popular);
                 mPresenter.popularMoviesSelected();
 
             case R.id.toprated_movies:
+                mPresenter.setPopularSelected(false);
+                mToolbar.setTitle(R.string.menu_toprated);
                 mPresenter.topRatedMoviesSelected();
 
             default:

@@ -7,8 +7,7 @@ import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.Po
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.MovieViewHolder;
 
 /**
- * Created by VutkaBilai on 3/1/17.
- * mail : la4508@gmail.com
+ * Created by abidhasan on 3/5/17.
  */
 
 public class TopRatedMovieAdapter extends RecyclerView.Adapter<MovieViewHolder> {
@@ -21,16 +20,16 @@ public class TopRatedMovieAdapter extends RecyclerView.Adapter<MovieViewHolder> 
 
     @Override
     public MovieViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return mPresenter.createTopMovieViewHolder(parent , viewType);
+        return mPresenter.createTopRatedViewHolder(parent , viewType);
     }
 
     @Override
     public void onBindViewHolder(MovieViewHolder holder, int position) {
-        mPresenter.bindTopMovieViewHolder(holder , position);
+        mPresenter.bindTopratedViewHolder(holder , position);
     }
 
     @Override
     public int getItemCount() {
-        return mPresenter.getTopItemCount();
+        return mPresenter.getTopRatedItemCount();
     }
 }

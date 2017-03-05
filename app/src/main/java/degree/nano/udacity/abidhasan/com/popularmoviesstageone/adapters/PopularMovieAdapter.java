@@ -11,11 +11,11 @@ import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.MovieViewHol
  * mail : la4508@gmail.com
  */
 
-public class PopularMovieadpter extends RecyclerView.Adapter<MovieViewHolder> {
+public class PopularMovieAdapter extends RecyclerView.Adapter<MovieViewHolder> {
 
     private PopularMoviesMVP.ProvidedPresenterOps mPresenter;
 
-    public PopularMovieadpter(PopularMoviesMVP.ProvidedPresenterOps mPresenter) {
+    public PopularMovieAdapter(PopularMoviesMVP.ProvidedPresenterOps mPresenter) {
         this.mPresenter = mPresenter;
     }
 
