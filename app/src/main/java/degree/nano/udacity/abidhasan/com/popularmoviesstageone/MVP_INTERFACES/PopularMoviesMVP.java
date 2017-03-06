@@ -35,6 +35,7 @@ public class PopularMoviesMVP {
         void hideProgressDialog();
         void showToast(Toast toast);
         void showAlert(AlertDialog alertDialog);
+        void goToDetailActivity(MovieGridItem item);
 
         RecyclerView getRecyclrView();
     }

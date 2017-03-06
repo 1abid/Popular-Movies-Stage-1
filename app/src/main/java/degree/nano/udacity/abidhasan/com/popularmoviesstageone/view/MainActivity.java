@@ -2,6 +2,7 @@ package degree.nano.udacity.abidhasan.com.popularmoviesstageone.view;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ActivityFr
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.PopularMoviesMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.MovieActivityModel;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.presenter.MoviePresenter;
 
 public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.RequiredViewOps {
@@ -169,6 +171,11 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     @Override
     public void showAlert(AlertDialog alertDialog) {
         alertDialog.show();
+    }
+
+    @Override
+    public void goToDetailActivity(MovieGridItem item) {
+        startActivity(new Intent(this , MovieDetailActivity.class));
     }
 
     @Override

@@ -346,8 +346,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         holder.setListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                String movieName = item.getMovieName();
-                getView().showToast(ToastMaker.makeToast(getActivityContext(), movieName));
+                getView().goToDetailActivity(item);
             }
         });
 

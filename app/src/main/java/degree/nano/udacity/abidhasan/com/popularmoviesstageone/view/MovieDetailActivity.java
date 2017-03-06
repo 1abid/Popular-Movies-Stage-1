@@ -5,53 +5,125 @@ import android.content.Context;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ActivityFragmentStatemaintainer;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.MovieDetailMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.MovieDetailModel;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.presenter.MovieDetailPresenter;
 
 public class MovieDetailActivity extends AppCompatActivity implements MovieDetailMVP.RequiredViewOps {
 
     private MovieDetailMVP.ProviedPresenterOps mPresenter;
+    private ProgressDialog pDialog;
+    private Toolbar mToolbar;
+
+    // Responsible to maintain the object's integrity
+    // during configurations change
+    private ActivityFragmentStatemaintainer mStateMaintainer
+            = new ActivityFragmentStatemaintainer(getFragmentManager(), getClass().getName());
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_movie_detail);
+
+        setUpViews();
+    }
+
+    private void setUpViews() {
+
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        setUpMVP();
+
+        if(pDialog == null)
+            pDialog = mPresenter.createProgressDialog();
+
+        if(mToolbar !=null)
+            setSupportActionBar(mToolbar);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPresenter.onDestroy(isChangingConfigurations());
+    }
+
+
+    /**
+     * Setup Model View Presenter pattern.
+     * Use a {@link ActivityFragmentStatemaintainer} to maintain the
+     * Presenter and Model instances between configuration changes.
+     * Could be done differently,
+     * using a dependency injection for example.
+     */
+    private void setUpMVP(){
+
+        if(mStateMaintainer.isFirstTimeIn()){
+
+            //create the presenter
+            MovieDetailPresenter presenter = new MovieDetailPresenter(this);
+
+            //create the model
+            MovieDetailModel model = new MovieDetailModel(presenter);
+
+            //set model for presenter
+            presenter.setModel(model);
+
+            //save presenter
+            /**
+             * save object {@link ActivityFragmentStatemaintainer}
+             */
+            mStateMaintainer.put(presenter);
+            mStateMaintainer.put(model);
+
+            //set the presenter as a interface
+            //to limit communication with it
+            mPresenter = presenter;
+        }
     }
 
     @Override
     public Context getAppContext() {
-        return null;
+        return getApplicationContext();
     }
 
     @Override
     public Context getActivityContext() {
-        return null;
+        return MovieDetailActivity.this;
     }
 
     @Override
     public ProgressDialog getProgressDialog() {
-        return null;
+
+        if (pDialog == null)
+            return mPresenter.createProgressDialog() ;
+
+        return pDialog;
     }
 
     @Override
     public void showProgressDialog() {
-
+        pDialog.show();
     }
 
     @Override
     public void hideProgressDialog() {
-
+        pDialog.hide();
     }
 
     @Override
     public void showToast(Toast toast) {
-
+        toast.show();
     }
 
     @Override
     public void showAlert(AlertDialog alertDialog) {
-
+        alertDialog.show();
     }
 }
