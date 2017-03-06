@@ -13,6 +13,8 @@ import android.view.MenuItem;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ActivityFragmentStatemaintainer;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.PopularMoviesMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
@@ -89,12 +91,10 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
         switch (item.getItemId()) {
             case R.id.popular_movies:
                 mPresenter.setPopularSelected(true);
-                mToolbar.setTitle(R.string.menu_popular);
                 mPresenter.popularMoviesSelected();
 
             case R.id.toprated_movies:
                 mPresenter.setPopularSelected(false);
-                mToolbar.setTitle(R.string.menu_toprated);
                 mPresenter.topRatedMoviesSelected();
 
             default:
@@ -175,7 +175,9 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
     @Override
     public void goToDetailActivity(MovieGridItem item) {
-        startActivity(new Intent(this , MovieDetailActivity.class));
+        Intent activity = new Intent(this , MovieDetailActivity.class);
+        activity.putExtra("movie_item" , new Gson().toJson(item));
+        startActivity(activity);
     }
 
     @Override

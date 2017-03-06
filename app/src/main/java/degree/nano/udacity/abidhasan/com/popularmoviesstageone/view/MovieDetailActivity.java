@@ -6,12 +6,16 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ActivityFragmentStatemaintainer;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.MovieDetailMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.MovieDetailModel;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.presenter.MovieDetailPresenter;
 
 public class MovieDetailActivity extends AppCompatActivity implements MovieDetailMVP.RequiredViewOps {
@@ -25,12 +29,20 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
     private ActivityFragmentStatemaintainer mStateMaintainer
             = new ActivityFragmentStatemaintainer(getFragmentManager(), getClass().getName());
 
+    private MovieGridItem selectedMovieItem;
+    private String toolbarTitle , moviegridItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_movie_detail);
+
+        Bundle extras = getIntent().getExtras();
+
+        selectedMovieItem = getSelectedMovieItem(extras);
+
+        Log.d(getClass().getSimpleName() , "selected movie "+ selectedMovieItem.getMovieId());
 
         setUpViews();
     }
@@ -46,6 +58,9 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
 
         if(mToolbar !=null)
             setSupportActionBar(mToolbar);
+
+        if(selectedMovieItem != null)
+            getSupportActionBar().setTitle(selectedMovieItem.getMovieTitle());
     }
 
     @Override
@@ -125,5 +140,13 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
     @Override
     public void showAlert(AlertDialog alertDialog) {
         alertDialog.show();
+    }
+
+    private MovieGridItem getSelectedMovieItem(Bundle b) {
+
+        if(b != null)
+            moviegridItem = b.getString("movie_item");
+
+        return new Gson().fromJson(moviegridItem , MovieGridItem.class);
     }
 }
