@@ -2,6 +2,7 @@ package degree.nano.udacity.abidhasan.com.popularmoviesstageone.view;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,11 +13,16 @@ import android.view.MenuItem;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ActivityFragmentStatemaintainer;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ToastMaker;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.PopularMoviesMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.MovieActivityModel;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.presenter.MoviePresenter;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.util.GetNetworkStatus;
 
 public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.RequiredViewOps {
 
@@ -49,7 +55,11 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
      * to load popularmoies
      */
     private void showPopularMovies() {
-        mPresenter.loadPopularMovies();
+
+        if(new GetNetworkStatus(getActivityContext()).isOnline())
+           mPresenter.loadPopularMovies();
+        else
+            showToast(ToastMaker.makeToast(getActivityContext() , " No internetConnection !"));
     }
 
 
@@ -87,12 +97,10 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
         switch (item.getItemId()) {
             case R.id.popular_movies:
                 mPresenter.setPopularSelected(true);
-                mToolbar.setTitle(R.string.menu_popular);
                 mPresenter.popularMoviesSelected();
 
             case R.id.toprated_movies:
                 mPresenter.setPopularSelected(false);
-                mToolbar.setTitle(R.string.menu_toprated);
                 mPresenter.topRatedMoviesSelected();
 
             default:
@@ -169,6 +177,13 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     @Override
     public void showAlert(AlertDialog alertDialog) {
         alertDialog.show();
+    }
+
+    @Override
+    public void goToDetailActivity(MovieGridItem item) {
+        Intent activity = new Intent(this , MovieDetailActivity.class);
+        activity.putExtra("movie_item" , new Gson().toJson(item));
+        startActivity(activity);
     }
 
     @Override

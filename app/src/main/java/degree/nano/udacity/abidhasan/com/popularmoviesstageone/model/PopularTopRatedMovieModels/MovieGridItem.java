@@ -14,6 +14,7 @@ public class MovieGridItem {
     private String movieTitle;
     private String movieBackDropPath;
     private String moviePosterPath;
+    private String MovieOverView;
 
     public MovieGridItem() {
     }
@@ -72,5 +73,13 @@ public class MovieGridItem {
 
     public String getMovieReleaseDate() {
         return movieReleaseDate;
+    }
+
+    public String getMovieOverView() {
+        return MovieOverView;
+    }
+
+    public void setMovieOverView(String movieOverView) {
+        MovieOverView = movieOverView;
     }
 }

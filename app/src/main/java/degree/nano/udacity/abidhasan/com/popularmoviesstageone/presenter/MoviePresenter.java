@@ -29,6 +29,7 @@ import degree.nano.udacity.abidhasan.com.popularmoviesstageone.adapters.TopRated
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.interfaces.OnItemClickListener;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.util.API_URLS;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.util.GetNetworkStatus;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.util.GridSpacingItemDecoration;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.MovieViewHolder;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.MainActivity;
@@ -111,15 +112,19 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
     @Override
     public void popularMoviesSelected() {
-        if (isPopularSelected())
+        if (isPopularSelected() && new GetNetworkStatus(getActivityContext()).isOnline())
             mModel.loadPopularMovies();
+        else
+            getView().showToast(ToastMaker.makeToast(getActivityContext() , "no internet connection !"));
     }
 
 
     @Override
     public void topRatedMoviesSelected() {
-        if (!isPopularSelected())
+        if (!isPopularSelected() && new GetNetworkStatus(getActivityContext()).isOnline())
             mModel.loadTopRatedMovies();
+        else
+            getView().showToast(ToastMaker.makeToast(getActivityContext() , "no internet connection !"));
     }
 
 
@@ -147,6 +152,12 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
     @Override
     public void loadPopularMovies() {
+
+        if("".equals(API_URLS.TMDB_API_KEY)){
+            getView().showToast(ToastMaker.makeToast(getActivityContext() , "use your TMDB api key"));
+
+            return;
+        }
 
         if (mPopularMovies.size() == 0)
             mModel.loadPopularMovies();
@@ -182,6 +193,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
         popularMovieadpter = new PopularMovieAdapter(this);
         movieRV.setAdapter(popularMovieadpter);
+
         popularMovieadpter.notifyDataSetChanged();
     }
 
@@ -193,7 +205,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
             addTopRatedMoviesGridItem();
 
         topRatedMovieAdapter = new TopRatedMovieAdapter(this);
-        movieRV.swapAdapter(topRatedMovieAdapter,true);
+        movieRV.swapAdapter(topRatedMovieAdapter, true);
         topRatedMovieAdapter.notifyDataSetChanged();
     }
 
@@ -346,8 +358,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         holder.setListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                String movieName = item.getMovieName();
-                getView().showToast(ToastMaker.makeToast(getActivityContext(), movieName));
+                getView().goToDetailActivity(item);
             }
         });
 
