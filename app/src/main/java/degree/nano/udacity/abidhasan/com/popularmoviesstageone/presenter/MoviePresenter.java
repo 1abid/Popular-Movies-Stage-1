@@ -182,6 +182,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
         popularMovieadpter = new PopularMovieAdapter(this);
         movieRV.setAdapter(popularMovieadpter);
+
         popularMovieadpter.notifyDataSetChanged();
     }
 
@@ -193,7 +194,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
             addTopRatedMoviesGridItem();
 
         topRatedMovieAdapter = new TopRatedMovieAdapter(this);
-        movieRV.swapAdapter(topRatedMovieAdapter,true);
+        movieRV.swapAdapter(topRatedMovieAdapter, true);
         topRatedMovieAdapter.notifyDataSetChanged();
     }
 
