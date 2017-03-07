@@ -152,6 +152,7 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
             String releaseDate = movie.getReleaseDate();
             String backDropPath = movie.getBackdropPath();
             String posterPath = movie.getPosterPath();
+            String movieOverView = movie.getOverView();
 
             item.setMovieId(movieId);
             item.setMovieName(movieName);
@@ -160,6 +161,7 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
             item.setMovieBackDropPath(backDropPath);
             item.setMoviePosterPath(posterPath);
             item.setMovieTitle(movieTitle);
+            item.setMovieOverView(movieOverView);
 
             popularMovieGridItems.add(item);
 
@@ -186,6 +188,7 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
             String releaseDate = movie.getReleaseDate();
             String backDropPath = movie.getBackdropPath();
             String posterPath = movie.getPosterPath();
+            String movieOverView = movie.getOverView();
 
             item.setMovieId(movieId);
             item.setMovieName(movieName);
@@ -194,6 +197,7 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
             item.setMovieBackDropPath(backDropPath);
             item.setMoviePosterPath(posterPath);
             item.setMovieTitle(movieTitle);
+            item.setMovieOverView(movieOverView);
 
             topRatedMoviesGridItems.add(item);
 

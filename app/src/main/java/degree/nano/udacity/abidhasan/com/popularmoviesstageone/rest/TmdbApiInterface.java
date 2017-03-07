@@ -26,5 +26,5 @@ public interface TmdbApiInterface {
 
     //get movie detail
     @GET("/movie/{movie_id}")
-    Call<MovieDetailResponse> getMovieDetail(@Path("movie_id") int movieId);
+    Call<MovieDetailResponse> getMovieDetail(@Path("movie_id") int movieId, @Query("api_key") String apiKey);
 }

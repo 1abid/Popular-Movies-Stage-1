@@ -3,7 +3,12 @@ package degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.v7.app.AlertDialog;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.MovieDetilModels.MovieDetailResponse;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
 
 /**
  * Created by VutkaBilai on 3/5/17.
@@ -30,6 +35,12 @@ public class MovieDetailMVP {
         void showToast(Toast toast);
         void showAlert(AlertDialog alertDialog);
 
+        ImageView getBackdropImageView();
+        ImageView getPosterImageView();
+        TextView getTitleTv();
+        TextView getRatingTv();
+        TextView getRelaseDateTv();
+        TextView getOverViewTv();
 
     }
 
@@ -47,6 +58,8 @@ public class MovieDetailMVP {
 
         ProgressDialog createProgressDialog();
         void setProgressDialogMsg(String msg );
+
+        void loadMovieDetail(MovieGridItem movie);
     }
 
 
@@ -67,5 +80,7 @@ public class MovieDetailMVP {
      */
     public interface ProvidedModelOps{
         void onDestroy(boolean isConfigurationChanging);
+
+        MovieDetailResponse loadMovieDetail(int movieId);
     }
 }
