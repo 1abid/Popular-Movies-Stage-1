@@ -16,11 +16,13 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ActivityFragmentStatemaintainer;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ToastMaker;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.PopularMoviesMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.MovieActivityModel;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.presenter.MoviePresenter;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.util.GetNetworkStatus;
 
 public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.RequiredViewOps {
 
@@ -53,7 +55,11 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
      * to load popularmoies
      */
     private void showPopularMovies() {
-        mPresenter.loadPopularMovies();
+
+        if(new GetNetworkStatus(getActivityContext()).isOnline())
+           mPresenter.loadPopularMovies();
+        else
+            showToast(ToastMaker.makeToast(getActivityContext() , " No internetConnection !"));
     }
 
 
