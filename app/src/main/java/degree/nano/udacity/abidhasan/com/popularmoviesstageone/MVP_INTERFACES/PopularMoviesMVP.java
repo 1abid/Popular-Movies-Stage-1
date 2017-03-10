@@ -50,6 +50,7 @@ public class PopularMoviesMVP {
     public interface ProvidedPresenterOps{
 
         void onDestroy(boolean isChangingConfigurations);
+        void onConfigurationChanged(RequiredViewOps view);
         void setView(RequiredViewOps view);
         boolean onCreateOptionMenu(Menu menu);
 

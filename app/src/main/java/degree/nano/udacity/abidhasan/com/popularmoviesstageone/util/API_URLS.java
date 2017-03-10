@@ -11,5 +11,5 @@ public class API_URLS {
 
     public static final String IMAGE_PATH = "https://image.tmdb.org/t/p/w780";
 
-    public static final String TMDB_API_KEY = "";
+    public static final String TMDB_API_KEY = "b12d07ff327681317e5377efd3b210b7";
 }

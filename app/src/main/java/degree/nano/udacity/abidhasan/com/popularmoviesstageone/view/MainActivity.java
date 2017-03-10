@@ -1,5 +1,6 @@
 package degree.nano.udacity.abidhasan.com.popularmoviesstageone.view;
 
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Switch;
@@ -40,9 +42,9 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         setContentView(R.layout.activity_main);
 
+        setUpMvp();
         setUpViews();
 
         showPopularMovies();
@@ -56,10 +58,10 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
      */
     private void showPopularMovies() {
 
-        if(new GetNetworkStatus(getActivityContext()).isOnline())
-           mPresenter.loadPopularMovies();
+        if (new GetNetworkStatus(getActivityContext()).isOnline())
+            mPresenter.loadPopularMovies();
         else
-            showToast(ToastMaker.makeToast(getActivityContext() , " No internetConnection !"));
+            showToast(ToastMaker.makeToast(getActivityContext(), " No internetConnection !"));
     }
 
 
@@ -67,8 +69,6 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         movieRecyclerView = (RecyclerView) findViewById(R.id.rvMovies);
-
-        setUpMvp();
 
         if (pDailog == null)
             pDailog = mPresenter.createProgressDialog();
@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
 
     }
+
 
     @Override
     protected void onDestroy() {
@@ -118,25 +119,65 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
      */
     private void setUpMvp() {
 
-        if (mStateMaintainer.isFirstTimeIn()) {
+        try {
+            if (mStateMaintainer.isFirstTimeIn()) {
 
-            //create the presenter
-            MoviePresenter presenter = new MoviePresenter(this);
+                initilize(this);
 
-            //create the model
-            MovieActivityModel model = new MovieActivityModel(presenter);
+            } else {
+                reInitialize(this);
+            }
+        }catch (InstantiationException | IllegalAccessException e){
+            Log.d(getClass().getSimpleName(), "onCreate() " + e );
+            throw new RuntimeException( e );
+        }
 
-            //set presenter to model
-            presenter.setModel(model);
+    }
 
-            //save presenter
-            /**and model to {@link ActivityFragmentStatemaintainer}**/
-            mStateMaintainer.put(presenter);
-            mStateMaintainer.put(model);
+    /**
+     * Initialize relevant MVP Objects.
+     * Creates a Presenter instance, saves the presenter in {@link ActivityFragmentStatemaintainer}
+     * @param view
+     */
+    private void initilize(PopularMoviesMVP.RequiredViewOps view)
+            throws InstantiationException, IllegalAccessException {
 
-            //set the presenter as a interface
-            //to limit communication with it
-            mPresenter = presenter;
+        //create the presenter
+        MoviePresenter presenter = new MoviePresenter(this);
+
+        //create the model
+        MovieActivityModel model = new MovieActivityModel(presenter);
+
+        //set presenter to model
+        presenter.setModel(model);
+
+        //save presenter
+        /**and model to {@link ActivityFragmentStatemaintainer}**/
+        mStateMaintainer.put(PopularMoviesMVP.ProvidedPresenterOps.class.getSimpleName(), presenter);
+        mStateMaintainer.put(PopularMoviesMVP.ProvidedModelOps.class.getSimpleName(), model);
+
+        //set the presenter as a interface
+        //to limit communication with it
+        mPresenter = presenter;
+
+    }
+
+
+    /**
+     * Recovers Presenter and informs Presenter that occurred a config change.
+     * If Presenter has been lost, recreates a instance
+     */
+    private void reInitialize(PopularMoviesMVP.RequiredViewOps view)
+            throws InstantiationException, IllegalAccessException {
+
+        mPresenter = mStateMaintainer.get(PopularMoviesMVP.ProvidedPresenterOps.class.getSimpleName());
+
+        if (mPresenter == null) {
+            Log.d(getClass().getSimpleName(), "Ininitalizing view");
+            initilize(view);
+        } else {
+            Log.d(getClass().getSimpleName(), "reinitalizing view");
+            mPresenter.setView(view);
         }
     }
 
@@ -153,10 +194,10 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     @Override
     public ProgressDialog getProgressDialog() {
 
-        if (pDailog != null)
-            return pDailog;
+        if (pDailog == null)
+            return mPresenter.createProgressDialog() ;
 
-        return null;
+        return pDailog;
     }
 
     @Override
@@ -181,8 +222,8 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
     @Override
     public void goToDetailActivity(MovieGridItem item) {
-        Intent activity = new Intent(this , MovieDetailActivity.class);
-        activity.putExtra("movie_item" , new Gson().toJson(item));
+        Intent activity = new Intent(this, MovieDetailActivity.class);
+        activity.putExtra("movie_item", new Gson().toJson(item));
         startActivity(activity);
     }
 

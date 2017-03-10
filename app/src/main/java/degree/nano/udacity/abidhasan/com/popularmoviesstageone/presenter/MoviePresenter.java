@@ -47,6 +47,11 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     //model reference
     private PopularMoviesMVP.ProvidedModelOps mModel;
 
+
+    // Configuration change state
+    private boolean mIsChangingConfig;
+
+
     private PopularMovieAdapter popularMovieadpter;
     private TopRatedMovieAdapter topRatedMovieAdapter;
     private RecyclerView movieRV;
@@ -55,6 +60,8 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     private List<MovieGridItem> mTopRatedMovies;
 
     private boolean isPopularSelected = true;
+
+
 
     public MoviePresenter(PopularMoviesMVP.RequiredViewOps mView) {
         this.mView = new WeakReference<PopularMoviesMVP.RequiredViewOps>(mView);
@@ -84,10 +91,26 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         //inform model about the event
         mModel.onDestroy(isChangingConfigurations);
 
+        mIsChangingConfig = isChangingConfigurations;
         //activity destroyed
         if (!isChangingConfigurations) {
             mModel = null;
         }
+    }
+
+    /**
+     * Sent from Activity after a configuration changes
+     * @param view  View reference
+     */
+    @Override
+    public void onConfigurationChanged(PopularMoviesMVP.RequiredViewOps view) {
+
+        setView(view);
+
+        if(isPopularSelected())
+            mModel.loadPopularMovies();
+        else
+            mModel.loadTopRatedMovies();
     }
 
     /**
