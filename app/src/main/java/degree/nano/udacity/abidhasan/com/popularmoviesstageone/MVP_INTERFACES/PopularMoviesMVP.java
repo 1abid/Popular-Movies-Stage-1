@@ -68,8 +68,6 @@ public class PopularMoviesMVP {
         void bindTopratedViewHolder(MovieViewHolder holder , int position);
         int getTopRatedItemCount();
 
-
-        ProgressDialog createProgressDialog();
         void setProgressDialogMsg(String msg , ProgressDialog progressDialog);
         void loadPopularMovies();
         void loadTopRatedMovies();

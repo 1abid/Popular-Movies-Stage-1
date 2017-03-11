@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
         movieRecyclerView = (RecyclerView) findViewById(R.id.rvMovies);
 
         if (pDailog == null)
-            pDailog = mPresenter.createProgressDialog();
+            pDailog = createProgressDialog();
 
         if (mToolbar != null)
             setSupportActionBar(mToolbar);
@@ -83,7 +83,16 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         mPresenter.onDestroy(isChangingConfigurations());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if(pDailog!=null)
+            pDailog.dismiss();
     }
 
     @Override
@@ -127,9 +136,9 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
             } else {
                 reInitialize(this);
             }
-        }catch (InstantiationException | IllegalAccessException e){
-            Log.d(getClass().getSimpleName(), "onCreate() " + e );
-            throw new RuntimeException( e );
+        } catch (InstantiationException | IllegalAccessException e) {
+            Log.d(getClass().getSimpleName(), "onCreate() " + e);
+            throw new RuntimeException(e);
         }
 
     }
@@ -137,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     /**
      * Initialize relevant MVP Objects.
      * Creates a Presenter instance, saves the presenter in {@link ActivityFragmentStatemaintainer}
+     *
      * @param view
      */
     private void initilize(PopularMoviesMVP.RequiredViewOps view)
@@ -195,13 +205,16 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     public ProgressDialog getProgressDialog() {
 
         if (pDailog == null)
-            return mPresenter.createProgressDialog() ;
+            pDailog = createProgressDialog();
 
         return pDailog;
     }
 
     @Override
     public void showProgressDialog() {
+        if (pDailog == null)
+            pDailog = createProgressDialog();
+
         pDailog.show();
     }
 
@@ -225,6 +238,17 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
         Intent activity = new Intent(this, MovieDetailActivity.class);
         activity.putExtra("movie_item", new Gson().toJson(item));
         startActivity(activity);
+    }
+
+
+    private ProgressDialog createProgressDialog(){
+        pDailog = new ProgressDialog(getActivityContext()
+                , R.style.AppTheme_Dark_Dialog);
+
+        pDailog.setIndeterminate(true);
+        pDailog.setCancelable(false);
+
+        return pDailog;
     }
 
     @Override

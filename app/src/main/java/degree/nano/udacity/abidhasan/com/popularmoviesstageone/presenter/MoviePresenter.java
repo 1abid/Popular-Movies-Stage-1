@@ -107,10 +107,6 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
         setView(view);
 
-        if(isPopularSelected())
-            mModel.loadPopularMovies();
-        else
-            mModel.loadTopRatedMovies();
     }
 
     /**
@@ -151,22 +147,6 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     }
 
 
-    /**
-     * show progressDialog
-     * for showing network
-     * calling progress
-     */
-    @Override
-    public ProgressDialog createProgressDialog() {
-
-        ProgressDialog pDialog = new ProgressDialog(getView().getActivityContext()
-                , R.style.AppTheme_Dark_Dialog);
-
-        pDialog.setIndeterminate(true);
-        pDialog.setCancelable(false);
-
-        return pDialog;
-    }
 
     @Override
     public void setProgressDialogMsg(String msg, ProgressDialog progressDialog) {
