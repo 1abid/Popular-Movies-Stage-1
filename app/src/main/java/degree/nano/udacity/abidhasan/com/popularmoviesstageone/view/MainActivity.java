@@ -42,15 +42,27 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
-
         setUpMvp();
+        Log.d(getClass().getSimpleName() , "lifecycle_event :onCreate()");
+        setContentView(R.layout.activity_main);
         setUpViews();
-
-        showPopularMovies();
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(getClass().getSimpleName() , "lifecycle_event :onStart()");
+
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(getClass().getSimpleName() , "lifecycle_event :onResume()");
+        showPopularMovies();
+    }
 
     /**
      * tells presenter
@@ -76,24 +88,36 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
         if (mToolbar != null)
             setSupportActionBar(mToolbar);
 
-
     }
 
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        mPresenter.onDestroy(isChangingConfigurations());
-    }
 
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d(getClass().getSimpleName() , "lifecycle_event :onPause()");
 
         if(pDailog!=null)
             pDailog.dismiss();
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(getClass().getSimpleName() , "lifecycle_event :onStop()");
+        mPresenter.onConfigurationChanged(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(getClass().getSimpleName() , "lifecycle_event :onDestroy()");
+        mPresenter.onDestroy(isChangingConfigurations());
+    }
+
+
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -134,10 +158,11 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
                 initilize(this);
 
             } else {
+                Log.d(getClass().getSimpleName() , " reinitializing...");
                 reInitialize(this);
             }
         } catch (InstantiationException | IllegalAccessException e) {
-            Log.d(getClass().getSimpleName(), "onCreate() " + e);
+            Log.e(getClass().getSimpleName(), "onCreate() " + e);
             throw new RuntimeException(e);
         }
 
@@ -187,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
             initilize(view);
         } else {
             Log.d(getClass().getSimpleName(), "reinitalizing view");
-            mPresenter.setView(view);
+            mPresenter.onConfigurationChanged(this);
         }
     }
 
@@ -253,6 +278,12 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
     @Override
     public RecyclerView getRecyclrView() {
+
+        if(movieRecyclerView == null) {
+
+            return movieRecyclerView = (RecyclerView) findViewById(R.id.rvMovies);
+        }
+
         return movieRecyclerView;
     }
 }

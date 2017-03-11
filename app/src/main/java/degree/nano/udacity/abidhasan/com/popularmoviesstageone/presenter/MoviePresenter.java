@@ -233,9 +233,6 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         for (MovieGridItem item : getPopularMovies()) {
             mPopularMovies.add(item);
         }
-
-        Log.d(getClass().getSimpleName(), "popularMovies list " + mPopularMovies.size()
-                + " isSelectedPopular " + isPopularSelected());
     }
 
     private List<MovieGridItem> getPopularMovies() {
