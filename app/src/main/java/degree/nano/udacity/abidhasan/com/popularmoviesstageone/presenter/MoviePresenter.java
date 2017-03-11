@@ -62,7 +62,6 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     private boolean isPopularSelected = true;
 
 
-
     public MoviePresenter(PopularMoviesMVP.RequiredViewOps mView) {
         this.mView = new WeakReference<PopularMoviesMVP.RequiredViewOps>(mView);
 
@@ -100,7 +99,8 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
     /**
      * Sent from Activity after a configuration changes
-     * @param view  View reference
+     *
+     * @param view View reference
      */
     @Override
     public void onConfigurationChanged(PopularMoviesMVP.RequiredViewOps view) {
@@ -134,7 +134,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         if (isPopularSelected() && new GetNetworkStatus(getActivityContext()).isOnline())
             mModel.loadPopularMovies();
         else
-            getView().showToast(ToastMaker.makeToast(getActivityContext() , "no internet connection !"));
+            getView().showToast(ToastMaker.makeToast(getActivityContext(), "no internet connection !"));
     }
 
 
@@ -143,9 +143,8 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         if (!isPopularSelected() && new GetNetworkStatus(getActivityContext()).isOnline())
             mModel.loadTopRatedMovies();
         else
-            getView().showToast(ToastMaker.makeToast(getActivityContext() , "no internet connection !"));
+            getView().showToast(ToastMaker.makeToast(getActivityContext(), "no internet connection !"));
     }
-
 
 
     @Override
@@ -156,8 +155,8 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     @Override
     public void loadPopularMovies() {
 
-        if("".equals(API_URLS.TMDB_API_KEY)){
-            getView().showToast(ToastMaker.makeToast(getActivityContext() , "use your TMDB api key"));
+        if ("".equals(API_URLS.TMDB_API_KEY)) {
+            getView().showToast(ToastMaker.makeToast(getActivityContext(), "use your TMDB api key"));
 
             return;
         }
@@ -180,15 +179,14 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
     public void showPopularMovies() {
 
-        if (movieRV == null) {
-            movieRV = getView().getRecyclrView();
 
-            GridLayoutManager mLayoutManager = new GridLayoutManager(getActivityContext(), 2);
-            movieRV.setLayoutManager(mLayoutManager);
+        movieRV = getView().getRecyclrView();
 
-            int spacingInPixels = getAppContext().getResources().getDimensionPixelSize(R.dimen.grid_item_space);
-            movieRV.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));
-        }
+        GridLayoutManager mLayoutManager = new GridLayoutManager(getActivityContext(), 2);
+        movieRV.setLayoutManager(mLayoutManager);
+
+        int spacingInPixels = getAppContext().getResources().getDimensionPixelSize(R.dimen.grid_item_space);
+        movieRV.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));
 
 
         if (mPopularMovies.size() == 0)
