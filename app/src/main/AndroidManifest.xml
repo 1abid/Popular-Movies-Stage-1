@@ -17,7 +17,6 @@
             android:name=".view.MainActivity"
             android:allowBackup="true"
             android:configChanges="orientation|keyboard|keyboardHidden"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Dark">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,7 +28,6 @@
             android:name=".view.MovieDetailActivity"
             android:allowBackup="true"
             android:configChanges="orientation|keyboard|keyboardHidden"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Dark"></activity>
     </application>
 

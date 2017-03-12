@@ -50,6 +50,7 @@ public class PopularMoviesMVP {
     public interface ProvidedPresenterOps{
 
         void onDestroy(boolean isChangingConfigurations);
+        void onConfigurationChanged(RequiredViewOps view);
         void setView(RequiredViewOps view);
         boolean onCreateOptionMenu(Menu menu);
 
@@ -67,8 +68,6 @@ public class PopularMoviesMVP {
         void bindTopratedViewHolder(MovieViewHolder holder , int position);
         int getTopRatedItemCount();
 
-
-        ProgressDialog createProgressDialog();
         void setProgressDialogMsg(String msg , ProgressDialog progressDialog);
         void loadPopularMovies();
         void loadTopRatedMovies();

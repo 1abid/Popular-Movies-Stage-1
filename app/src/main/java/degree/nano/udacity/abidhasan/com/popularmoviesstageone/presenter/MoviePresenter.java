@@ -47,6 +47,11 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     //model reference
     private PopularMoviesMVP.ProvidedModelOps mModel;
 
+
+    // Configuration change state
+    private boolean mIsChangingConfig;
+
+
     private PopularMovieAdapter popularMovieadpter;
     private TopRatedMovieAdapter topRatedMovieAdapter;
     private RecyclerView movieRV;
@@ -55,6 +60,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     private List<MovieGridItem> mTopRatedMovies;
 
     private boolean isPopularSelected = true;
+
 
     public MoviePresenter(PopularMoviesMVP.RequiredViewOps mView) {
         this.mView = new WeakReference<PopularMoviesMVP.RequiredViewOps>(mView);
@@ -84,10 +90,23 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         //inform model about the event
         mModel.onDestroy(isChangingConfigurations);
 
+        mIsChangingConfig = isChangingConfigurations;
         //activity destroyed
         if (!isChangingConfigurations) {
             mModel = null;
         }
+    }
+
+    /**
+     * Sent from Activity after a configuration changes
+     *
+     * @param view View reference
+     */
+    @Override
+    public void onConfigurationChanged(PopularMoviesMVP.RequiredViewOps view) {
+
+        setView(view);
+
     }
 
     /**
@@ -115,7 +134,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         if (isPopularSelected() && new GetNetworkStatus(getActivityContext()).isOnline())
             mModel.loadPopularMovies();
         else
-            getView().showToast(ToastMaker.makeToast(getActivityContext() , "no internet connection !"));
+            getView().showToast(ToastMaker.makeToast(getActivityContext(), "no internet connection !"));
     }
 
 
@@ -124,26 +143,9 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         if (!isPopularSelected() && new GetNetworkStatus(getActivityContext()).isOnline())
             mModel.loadTopRatedMovies();
         else
-            getView().showToast(ToastMaker.makeToast(getActivityContext() , "no internet connection !"));
+            getView().showToast(ToastMaker.makeToast(getActivityContext(), "no internet connection !"));
     }
 
-
-    /**
-     * show progressDialog
-     * for showing network
-     * calling progress
-     */
-    @Override
-    public ProgressDialog createProgressDialog() {
-
-        ProgressDialog pDialog = new ProgressDialog(getView().getActivityContext()
-                , R.style.AppTheme_Dark_Dialog);
-
-        pDialog.setIndeterminate(true);
-        pDialog.setCancelable(false);
-
-        return pDialog;
-    }
 
     @Override
     public void setProgressDialogMsg(String msg, ProgressDialog progressDialog) {
@@ -153,8 +155,8 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     @Override
     public void loadPopularMovies() {
 
-        if("".equals(API_URLS.TMDB_API_KEY)){
-            getView().showToast(ToastMaker.makeToast(getActivityContext() , "use your TMDB api key"));
+        if ("".equals(API_URLS.TMDB_API_KEY)) {
+            getView().showToast(ToastMaker.makeToast(getActivityContext(), "use your TMDB api key"));
 
             return;
         }
@@ -177,15 +179,14 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
     public void showPopularMovies() {
 
-        if (movieRV == null) {
-            movieRV = getView().getRecyclrView();
 
-            GridLayoutManager mLayoutManager = new GridLayoutManager(getActivityContext(), 2);
-            movieRV.setLayoutManager(mLayoutManager);
+        movieRV = getView().getRecyclrView();
 
-            int spacingInPixels = getAppContext().getResources().getDimensionPixelSize(R.dimen.grid_item_space);
-            movieRV.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));
-        }
+        GridLayoutManager mLayoutManager = new GridLayoutManager(getActivityContext(), 2);
+        movieRV.setLayoutManager(mLayoutManager);
+
+        int spacingInPixels = getAppContext().getResources().getDimensionPixelSize(R.dimen.grid_item_space);
+        movieRV.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));
 
 
         if (mPopularMovies.size() == 0)
@@ -230,9 +231,6 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         for (MovieGridItem item : getPopularMovies()) {
             mPopularMovies.add(item);
         }
-
-        Log.d(getClass().getSimpleName(), "popularMovies list " + mPopularMovies.size()
-                + " isSelectedPopular " + isPopularSelected());
     }
 
     private List<MovieGridItem> getPopularMovies() {
