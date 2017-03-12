@@ -179,15 +179,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
     public void showPopularMovies() {
 
-
-        movieRV = getView().getRecyclrView();
-
-        GridLayoutManager mLayoutManager = new GridLayoutManager(getActivityContext(), 2);
-        movieRV.setLayoutManager(mLayoutManager);
-
-        int spacingInPixels = getAppContext().getResources().getDimensionPixelSize(R.dimen.grid_item_space);
-        movieRV.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));
-
+        initializeRecylerView();
 
         if (mPopularMovies.size() == 0)
             addPopularMovieGriditem();
@@ -196,11 +188,13 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         movieRV.setAdapter(popularMovieadpter);
 
         popularMovieadpter.notifyDataSetChanged();
+
     }
 
 
     public void showTopRatedMovies() {
 
+        initializeRecylerView();
 
         if (mTopRatedMovies.size() == 0)
             addTopRatedMoviesGridItem();
@@ -208,6 +202,19 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
         topRatedMovieAdapter = new TopRatedMovieAdapter(this);
         movieRV.swapAdapter(topRatedMovieAdapter, true);
         topRatedMovieAdapter.notifyDataSetChanged();
+
+    }
+
+
+    private void initializeRecylerView(){
+
+        movieRV = getView().getRecyclrView();
+
+        GridLayoutManager mLayoutManager = new GridLayoutManager(getActivityContext(), 2);
+        movieRV.setLayoutManager(mLayoutManager);
+
+        int spacingInPixels = getAppContext().getResources().getDimensionPixelSize(R.dimen.grid_item_space);
+        movieRV.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));
     }
 
     /**

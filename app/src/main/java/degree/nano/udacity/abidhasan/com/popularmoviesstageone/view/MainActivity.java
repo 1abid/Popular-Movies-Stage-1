@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
         super.onCreate(savedInstanceState);
 
         setUpMvp();
-        Log.d(getClass().getSimpleName() , "lifecycle_event :onCreate()");
+        Log.d(getClass().getSimpleName(), "lifecycle_event :onCreate()");
         setContentView(R.layout.activity_main);
         setUpViews();
 
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(getClass().getSimpleName() , "lifecycle_event :onStart()");
+        Log.d(getClass().getSimpleName(), "lifecycle_event :onStart()");
 
     }
 
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(getClass().getSimpleName() , "lifecycle_event :onResume()");
+        Log.d(getClass().getSimpleName(), "lifecycle_event :onResume()");
         showPopularMovies();
     }
 
@@ -70,9 +70,15 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
      */
     private void showPopularMovies() {
 
-        if (new GetNetworkStatus(getActivityContext()).isOnline())
-            mPresenter.loadPopularMovies();
-        else
+        if (new GetNetworkStatus(getActivityContext()).isOnline()) {
+            if (mPresenter.isPopularSelected()) {
+                Log.d(getClass().getSimpleName() , "popular selected");
+                mPresenter.loadPopularMovies();
+            }else {
+                Log.d(getClass().getSimpleName() , "Toprated selected");
+                mPresenter.loadTopRatedMovies();
+            }
+        } else
             showToast(ToastMaker.makeToast(getActivityContext(), " No internetConnection !"));
     }
 
@@ -94,29 +100,25 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(getClass().getSimpleName() , "lifecycle_event :onPause()");
+        Log.d(getClass().getSimpleName(), "lifecycle_event :onPause()");
 
-        if(pDailog!=null)
+        if (pDailog != null)
             pDailog.dismiss();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(getClass().getSimpleName() , "lifecycle_event :onStop()");
+        Log.d(getClass().getSimpleName(), "lifecycle_event :onStop()");
         mPresenter.onConfigurationChanged(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(getClass().getSimpleName() , "lifecycle_event :onDestroy()");
+        Log.d(getClass().getSimpleName(), "lifecycle_event :onDestroy()");
         mPresenter.onDestroy(isChangingConfigurations());
     }
-
-
-
-
 
 
     @Override
@@ -158,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
                 initilize(this);
 
             } else {
-                Log.d(getClass().getSimpleName() , " reinitializing...");
+                Log.d(getClass().getSimpleName(), " reinitializing...");
                 reInitialize(this);
             }
         } catch (InstantiationException | IllegalAccessException e) {
@@ -266,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     }
 
 
-    private ProgressDialog createProgressDialog(){
+    private ProgressDialog createProgressDialog() {
         pDailog = new ProgressDialog(getActivityContext()
                 , R.style.AppTheme_Dark_Dialog);
 
@@ -279,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     @Override
     public RecyclerView getRecyclrView() {
 
-        if(movieRecyclerView == null) {
+        if (movieRecyclerView == null) {
 
             return movieRecyclerView = (RecyclerView) findViewById(R.id.rvMovies);
         }
