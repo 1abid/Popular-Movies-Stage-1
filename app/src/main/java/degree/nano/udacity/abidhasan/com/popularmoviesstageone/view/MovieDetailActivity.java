@@ -161,7 +161,7 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
          * save object {@link ActivityFragmentStatemaintainer}
          */
         mStateMaintainer.put(MovieDetailMVP.ProviedPresenterOps.class.getSimpleName() , presenter);
-        mStateMaintainer.put(MovieDetailMVP.ProviedPresenterOps.class.getSimpleName() ,  model);
+        mStateMaintainer.put(MovieDetailMVP.ProvidedModelOps.class.getSimpleName() ,  model);
 
         //set the presenter as a interface
         //to limit communication with it
