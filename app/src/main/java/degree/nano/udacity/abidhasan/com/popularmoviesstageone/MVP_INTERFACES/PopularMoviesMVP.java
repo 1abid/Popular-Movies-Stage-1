@@ -64,6 +64,7 @@ public class PopularMoviesMVP {
         void bindPopularViewHolder(MovieViewHolder holder , int position);
         int getPopularItemCount();
 
+        void initializeRecyclerView();
         MovieViewHolder createTopRatedViewHolder(ViewGroup parent , int viewType);
         void bindTopratedViewHolder(MovieViewHolder holder , int position);
         int getTopRatedItemCount();

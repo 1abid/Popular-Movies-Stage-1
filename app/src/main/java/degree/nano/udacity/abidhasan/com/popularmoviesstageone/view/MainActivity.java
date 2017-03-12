@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
         setUpMvp();
         Log.d(getClass().getSimpleName(), "lifecycle_event :onCreate()");
+
         setContentView(R.layout.activity_main);
         setUpViews();
 
@@ -61,21 +62,22 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     protected void onResume() {
         super.onResume();
         Log.d(getClass().getSimpleName(), "lifecycle_event :onResume()");
-        showPopularMovies();
+
+        showPopularMovies(mPresenter.isPopularSelected());
     }
 
     /**
      * tells presenter
      * to load popularmoies
      */
-    private void showPopularMovies() {
+    private void showPopularMovies(boolean isPopular) {
 
         if (new GetNetworkStatus(getActivityContext()).isOnline()) {
-            if (mPresenter.isPopularSelected()) {
-                Log.d(getClass().getSimpleName() , "popular selected");
+            if (isPopular) {
+                Log.d(getClass().getSimpleName(), "popular selected");
                 mPresenter.loadPopularMovies();
-            }else {
-                Log.d(getClass().getSimpleName() , "Toprated selected");
+            } else {
+                Log.d(getClass().getSimpleName(), "Toprated selected");
                 mPresenter.loadTopRatedMovies();
             }
         } else
@@ -87,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         movieRecyclerView = (RecyclerView) findViewById(R.id.rvMovies);
+
+        mPresenter.initializeRecyclerView();
 
         if (pDailog == null)
             pDailog = createProgressDialog();
@@ -110,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     protected void onStop() {
         super.onStop();
         Log.d(getClass().getSimpleName(), "lifecycle_event :onStop()");
+
         mPresenter.onConfigurationChanged(this);
     }
 
@@ -131,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
 
         switch (item.getItemId()) {
+
             case R.id.popular_movies:
                 mPresenter.setPopularSelected(true);
                 mPresenter.popularMoviesSelected();
@@ -209,13 +215,10 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
         mPresenter = mStateMaintainer.get(PopularMoviesMVP.ProvidedPresenterOps.class.getSimpleName());
 
-        if (mPresenter == null) {
-            Log.d(getClass().getSimpleName(), "Ininitalizing view");
+        if (mPresenter == null)
             initilize(view);
-        } else {
-            Log.d(getClass().getSimpleName(), "reinitalizing view");
+        else
             mPresenter.onConfigurationChanged(this);
-        }
     }
 
     @Override

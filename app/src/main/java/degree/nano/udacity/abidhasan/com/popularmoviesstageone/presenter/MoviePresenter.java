@@ -54,12 +54,11 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
     private PopularMovieAdapter popularMovieadpter;
     private TopRatedMovieAdapter topRatedMovieAdapter;
-    private RecyclerView movieRV;
 
     private List<MovieGridItem> mPopularMovies;
     private List<MovieGridItem> mTopRatedMovies;
 
-    private boolean isPopularSelected = true;
+    private boolean isPopularSelected = true ;
 
 
     public MoviePresenter(PopularMoviesMVP.RequiredViewOps mView) {
@@ -140,8 +139,10 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
     @Override
     public void topRatedMoviesSelected() {
-        if (!isPopularSelected() && new GetNetworkStatus(getActivityContext()).isOnline())
+        if (!isPopularSelected() && new GetNetworkStatus(getActivityContext()).isOnline()) {
+            Log.d(MainActivity.class.getSimpleName(), "popular movie " + isPopularSelected());
             mModel.loadTopRatedMovies();
+        }
         else
             getView().showToast(ToastMaker.makeToast(getActivityContext(), "no internet connection !"));
     }
@@ -179,13 +180,11 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
     public void showPopularMovies() {
 
-        initializeRecylerView();
-
         if (mPopularMovies.size() == 0)
             addPopularMovieGriditem();
 
         popularMovieadpter = new PopularMovieAdapter(this);
-        movieRV.setAdapter(popularMovieadpter);
+        getView().getRecyclrView().setAdapter(popularMovieadpter);
 
         popularMovieadpter.notifyDataSetChanged();
 
@@ -194,21 +193,20 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
     public void showTopRatedMovies() {
 
-        initializeRecylerView();
 
         if (mTopRatedMovies.size() == 0)
             addTopRatedMoviesGridItem();
 
         topRatedMovieAdapter = new TopRatedMovieAdapter(this);
-        movieRV.swapAdapter(topRatedMovieAdapter, true);
+        getView().getRecyclrView().swapAdapter(topRatedMovieAdapter, true);
         topRatedMovieAdapter.notifyDataSetChanged();
 
     }
 
+    @Override
+    public void initializeRecyclerView(){
 
-    private void initializeRecylerView(){
-
-        movieRV = getView().getRecyclrView();
+        RecyclerView movieRV = getView().getRecyclrView();
 
         GridLayoutManager mLayoutManager = new GridLayoutManager(getActivityContext(), 2);
         movieRV.setLayoutManager(mLayoutManager);
