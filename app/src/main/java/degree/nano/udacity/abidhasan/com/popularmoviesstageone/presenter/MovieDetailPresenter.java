@@ -12,6 +12,7 @@ import com.bumptech.glide.request.target.ViewTarget;
 import java.lang.ref.WeakReference;
 
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.MovieDetailMVP;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.PopularMoviesMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.util.API_URLS;
@@ -57,6 +58,12 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps,
         }
     }
 
+    @Override
+    public void onConfigurationChanged(MovieDetailMVP.RequiredViewOps view) {
+        setView(view);
+    }
+
+
     /**
      * called by {@link degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.MovieDetailActivity}
      * @param view
@@ -66,23 +73,6 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps,
         this.mView = new WeakReference<MovieDetailMVP.RequiredViewOps>(view);
     }
 
-
-    /**
-     * show progressDialog
-     * for showing network
-     * calling progress
-     */
-    @Override
-    public ProgressDialog createProgressDialog() {
-
-        ProgressDialog pDialog = new ProgressDialog(getView().getActivityContext()
-                , R.style.AppTheme_Dark_Dialog);
-
-        pDialog.setIndeterminate(true);
-        pDialog.setCancelable(false);
-
-        return pDialog;
-    }
 
     @Override
     public void setProgressDialogMsg(String msg) {

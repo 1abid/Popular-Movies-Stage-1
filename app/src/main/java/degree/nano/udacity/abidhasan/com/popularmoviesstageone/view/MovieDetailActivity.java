@@ -1,5 +1,6 @@
 package degree.nano.udacity.abidhasan.com.popularmoviesstageone.view;
 
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.v7.app.AlertDialog;
@@ -19,6 +20,8 @@ import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.MovieDetailModel;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.presenter.MovieDetailPresenter;
+
+import static degree.nano.udacity.abidhasan.com.popularmoviesstageone.R.styleable.Toolbar;
 
 public class MovieDetailActivity extends AppCompatActivity implements MovieDetailMVP.RequiredViewOps {
 
@@ -41,16 +44,26 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setUpMVP();
         setContentView(R.layout.activity_movie_detail);
 
         Bundle extras = getIntent().getExtras();
-
         selectedMovieItem = getSelectedMovieItem(extras);
-
         Log.d(getClass().getSimpleName() , "selected movie "+ selectedMovieItem.getMovieId());
-
         setUpViews();
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(getClass().getSimpleName() , "lifecycle_event :onStart()");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(getClass().getSimpleName() , "lifecycle_event :onResume()");
         showMovieDetails();
     }
 
@@ -73,10 +86,6 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
         releaseDateTv = (TextView) findViewById(R.id.releaseDate_tv);
         overViewTv = (TextView) findViewById(R.id.overView_tv);
 
-        setUpMVP();
-
-        if(pDialog == null)
-            pDialog = mPresenter.createProgressDialog();
 
         /*if(mToolbar !=null)
             setSupportActionBar(mToolbar);
@@ -86,8 +95,26 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(getClass().getSimpleName() , "lifecycle_event :onPause()");
+
+        if(pDialog != null)
+            pDialog.dismiss();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(getClass().getSimpleName() , "lifecycle_event :onStop()");
+
+        mPresenter.onConfigurationChanged(this);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.d(getClass().getSimpleName() , "lifecycle_event :onDestroy()");
         mPresenter.onDestroy(isChangingConfigurations());
     }
 
@@ -100,28 +127,63 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
      * using a dependency injection for example.
      */
     private void setUpMVP(){
+        try{
+            if(mStateMaintainer.isFirstTimeIn())
+                initialize(this);
+            else
+                reInitialize(this);
+        }catch (InstantiationException | IllegalAccessException e){
+            Log.e(getClass().getSimpleName() , "onCreate()"+e.getMessage());
+            throw  new RuntimeException(e);
+        }
+    }
 
-        if(mStateMaintainer.isFirstTimeIn()){
+    /**
+     * Initialize relevant MVP Objects.
+     * Creates a Presenter instance, saves the presenter in {@link ActivityFragmentStatemaintainer}
+     *
+     * @param view
+     */
+    private void initialize(MovieDetailMVP.RequiredViewOps view)
+        throws InstantiationException , IllegalAccessException{
 
-            //create the presenter
-            MovieDetailPresenter presenter = new MovieDetailPresenter(this);
+        //create the presenter
+        MovieDetailPresenter presenter = new MovieDetailPresenter(this);
 
-            //create the model
-            MovieDetailModel model = new MovieDetailModel(presenter);
+        //create the model
+        MovieDetailModel model = new MovieDetailModel(presenter);
 
-            //set model for presenter
-            presenter.setModel(model);
+        //set model for presenter
+        presenter.setModel(model);
 
-            //save presenter
-            /**
-             * save object {@link ActivityFragmentStatemaintainer}
-             */
-            mStateMaintainer.put(presenter);
-            mStateMaintainer.put(model);
+        //save presenter
+        /**
+         * save object {@link ActivityFragmentStatemaintainer}
+         */
+        mStateMaintainer.put(MovieDetailMVP.ProviedPresenterOps.class.getSimpleName() , presenter);
+        mStateMaintainer.put(MovieDetailMVP.ProviedPresenterOps.class.getSimpleName() ,  model);
 
-            //set the presenter as a interface
-            //to limit communication with it
-            mPresenter = presenter;
+        //set the presenter as a interface
+        //to limit communication with it
+        mPresenter = presenter;
+    }
+
+
+    /**
+     * Recovers Presenter and informs Presenter that occurred a config change.
+     * If Presenter has been lost, recreates a instance
+     */
+    private void reInitialize(MovieDetailMVP.RequiredViewOps view)
+        throws  InstantiationException , IllegalAccessException{
+
+        mPresenter = mStateMaintainer.get(MovieDetailMVP.ProviedPresenterOps.class.getSimpleName());
+
+        if(mPresenter == null){
+            Log.e(getClass().getSimpleName() , "didn't get presenter from stateMaintainer");
+            initialize(view);
+        }else {
+            Log.d(getClass().getSimpleName() , "reInitializing view ");
+            mPresenter.onConfigurationChanged(view);
         }
     }
 
@@ -139,7 +201,7 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
     public ProgressDialog getProgressDialog() {
 
         if (pDialog == null)
-            return mPresenter.createProgressDialog() ;
+            return pDialog = createProgressDialog() ;
 
         return pDialog;
     }
@@ -204,6 +266,15 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
         return new Gson().fromJson(moviegridItem , MovieGridItem.class);
     }
 
+    public ProgressDialog createProgressDialog() {
 
+        pDialog = new ProgressDialog(getActivityContext()
+                , R.style.AppTheme_Dark_Dialog);
+
+        pDialog.setIndeterminate(true);
+        pDialog.setCancelable(false);
+
+        return pDialog;
+    }
 
 }

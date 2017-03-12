@@ -54,9 +54,10 @@ public class MovieDetailMVP {
      */
     public interface ProviedPresenterOps{
         void onDestroy(boolean isChangingConfigurations);
+        void onConfigurationChanged(RequiredViewOps view);
         void setView(RequiredViewOps view);
 
-        ProgressDialog createProgressDialog();
+
         void setProgressDialogMsg(String msg );
 
         void loadMovieDetail(MovieGridItem movie);
