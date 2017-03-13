@@ -1,12 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
+    <!--<item
         android:id="@+id/popular_movies"
         app:showAsAction="ifRoom|withText"
         android:title="@string/menu_popular"></item>
     <item
         android:id="@+id/toprated_movies"
         app:showAsAction="ifRoom|withText"
-        android:title="@string/menu_toprated"></item>
+        android:title="@string/menu_toprated"></item>-->
+
+    <item
+        android:id="@+id/setting_menu"
+        app:showAsAction="never"
+        android:orderInCategory="100"
+        android:title="@string/menu_settings"></item>
 </menu>

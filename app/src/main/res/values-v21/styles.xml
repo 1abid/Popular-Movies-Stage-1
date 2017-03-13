@@ -33,6 +33,7 @@
         <item name="colorButtonNormal">@color/primary_darker</item>
         <item name="android:colorButtonNormal" tools:targetApi="lollipop">@color/primary_darker</item>
         <item name="android:typeface">monospace</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
     <style name="AppTheme.TransNav" parent="AppTheme.Dark">
