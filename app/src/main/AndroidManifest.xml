@@ -5,7 +5,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-
     <application
         android:name=".Application.PopularMovieApp"
         android:allowBackup="true"
@@ -17,7 +16,8 @@
             android:name=".view.MainActivity"
             android:allowBackup="true"
             android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@style/AppTheme.Dark">
+            android:theme="@style/AppTheme.Dark"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,7 +28,14 @@
             android:name=".view.MovieDetailActivity"
             android:allowBackup="true"
             android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@style/AppTheme.Dark"></activity>
+            android:theme="@style/AppTheme.Dark" />
+        <activity android:name=".view.SettingsActivity"
+            android:label="@string/menu_settings"
+            android:parentActivityName=".view.MainActivity"
+            android:theme="@style/AppTheme.Dark">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                android:value=".view.MainActivity"></meta-data>
+        </activity>
     </application>
 
 </manifest>
