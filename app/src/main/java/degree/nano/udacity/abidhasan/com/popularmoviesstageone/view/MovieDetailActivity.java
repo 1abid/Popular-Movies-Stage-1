@@ -6,6 +6,7 @@ import android.content.Context;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.ImageView;
@@ -31,6 +32,7 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
 
     private ImageView backDropIv, posterIv;
     public TextView titleTv , ratingTv , releaseDateTv , overViewTv;
+    private RecyclerView trailerRv;
 
     // Responsible to maintain the object's integrity
     // during configurations change
@@ -86,6 +88,7 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
         releaseDateTv = (TextView) findViewById(R.id.releaseDate_tv);
         overViewTv = (TextView) findViewById(R.id.overView_tv);
 
+        trailerRv = (RecyclerView) findViewById(R.id.trailerRv);
 
         /*if(mToolbar !=null)
             setSupportActionBar(mToolbar);
@@ -255,6 +258,16 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
     @Override
     public TextView getOverViewTv() {
         return overViewTv;
+    }
+
+    @Override
+    public RecyclerView getTrailerRV() {
+        return trailerRv;
+    }
+
+    @Override
+    public String getmovieId() {
+        return Integer.toString(selectedMovieItem.getMovieId());
     }
 
 

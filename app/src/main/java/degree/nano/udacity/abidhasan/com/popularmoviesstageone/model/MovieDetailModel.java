@@ -1,8 +1,16 @@
 package degree.nano.udacity.abidhasan.com.popularmoviesstageone.model;
 
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Application.RestServiceGenerator;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ToastMaker;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.MovieDetailMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.MovieDetilModels.MovieDetailResponse;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieTrailerModel.MovieTrailer;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieTrailerModel.MovieTrailerResponse;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.presenter.MovieDetailPresenter;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.rest.TmdbApiInterface;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.util.API_URLS;
@@ -19,14 +27,14 @@ public class MovieDetailModel implements MovieDetailMVP.ProvidedModelOps {
     private MovieDetailMVP.ProviedPresenterOps mPresenter;
     private MovieDetailPresenter movieDetailPresenter;
 
+    private ArrayList<MovieTrailer> trailerList;
 
     public MovieDetailModel(MovieDetailMVP.ProviedPresenterOps mPresenter) {
 
         this.mPresenter = mPresenter;
         movieDetailPresenter = (MovieDetailPresenter) mPresenter;
 
-
-
+        trailerList = new ArrayList<>();
     }
 
     @Override
@@ -38,32 +46,49 @@ public class MovieDetailModel implements MovieDetailMVP.ProvidedModelOps {
     @Override
     public MovieDetailResponse loadMovieDetail(int movieId) {
 
-        /*movieDetailPresenter.setProgressDialogMsg("loading...");
-        movieDetailPresenter.getView().showProgressDialog();
+
+        return null;
+    }
+
+    @Override
+    public List<MovieTrailer> getMovieTrailers(String movieId) {
 
 
         TmdbApiInterface apiInterface = RestServiceGenerator.createService(TmdbApiInterface.class);
 
-        Call<MovieDetailResponse> movieDetailCall = apiInterface.getMovieDetail(movieId , API_URLS.TMDB_API_KEY);
+        final Call<MovieTrailerResponse> trailers = apiInterface.getTrailers(movieId,API_URLS.TMDB_API_KEY);
 
-
-        movieDetailCall.enqueue(new Callback<MovieDetailResponse>() {
+        trailers.enqueue(new Callback<MovieTrailerResponse>() {
             @Override
-            public void onResponse(Call<MovieDetailResponse> call, Response<MovieDetailResponse> response) {
+            public void onResponse(Call<MovieTrailerResponse> call, Response<MovieTrailerResponse> response) {
 
-                if(response.isSuccessful()){
-
+                    if(response.isSuccessful()){
+                    addMovieTrailers(response.body().getTrailers());
                     movieDetailPresenter.getView().hideProgressDialog();
 
-
-                }
+                    movieDetailPresenter.onTrailerDownload(trailerList);
+                    }else {
+                        movieDetailPresenter.getView().showToast(ToastMaker.makeToast(movieDetailPresenter.getActivityContext()
+                                ,"something went wrong !"));
+                    }
             }
 
             @Override
-            public void onFailure(Call<MovieDetailResponse> call, Throwable t) {
-
+            public void onFailure(Call<MovieTrailerResponse> call, Throwable t) {
+                movieDetailPresenter.getView().hideProgressDialog();
             }
-        });*/
-        return null;
+        });
+        return trailerList;
     }
+
+    @Override
+    public int getTrailerItemCount() {
+        return trailerList.size() == 0 ? 0 : trailerList.size() ;
+    }
+
+    private void addMovieTrailers(ArrayList<MovieTrailer> trailers) {
+        this.trailerList = trailers;
+    }
+
+
 }

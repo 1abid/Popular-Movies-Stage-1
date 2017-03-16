@@ -3,6 +3,7 @@ package degree.nano.udacity.abidhasan.com.popularmoviesstageone.rest;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.MovieDetilModels.MovieDetailResponse;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.PopularMovieResponse;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.TopRatedMovieResponse;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieTrailerModel.MovieTrailerResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -27,4 +28,8 @@ public interface TmdbApiInterface {
     //get movie detail
     @GET("/movie/{movie_id}")
     Call<MovieDetailResponse> getMovieDetail(@Path("movie_id") int movieId, @Query("api_key") String apiKey);
+
+    //get movie trailers
+    @GET("movie/{movie_id}/videos")
+    Call<MovieTrailerResponse> getTrailers(@Path("movie_id") String movieId, @Query("api_key") String apiKey);
 }
