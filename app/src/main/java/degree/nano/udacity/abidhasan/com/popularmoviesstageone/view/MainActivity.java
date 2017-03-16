@@ -146,16 +146,6 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
         switch (item.getItemId()) {
 
-            /*case R.id.popular_movies:
-                mPresenter.setPopularSelected(true);
-                mPresenter.popularMoviesSelected();
-                break;
-
-            case R.id.toprated_movies:
-                mPresenter.setPopularSelected(false);
-                mPresenter.topRatedMoviesSelected();
-                break;*/
-
             case R.id.setting_menu:
                 startActivity(new Intent(this , SettingsActivity.class));
                 return true;

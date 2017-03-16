@@ -58,8 +58,6 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     private List<MovieGridItem> mPopularMovies;
     private List<MovieGridItem> mTopRatedMovies;
 
-    private boolean isPopularSelected = true ;
-
 
     public MoviePresenter(PopularMoviesMVP.RequiredViewOps mView) {
         this.mView = new WeakReference<PopularMoviesMVP.RequiredViewOps>(mView);
@@ -127,26 +125,6 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
         return true;
     }
-
-    @Override
-    public void popularMoviesSelected() {
-        if (isPopularSelected() && new GetNetworkStatus(getActivityContext()).isOnline())
-            mModel.loadPopularMovies();
-        else
-            getView().showToast(ToastMaker.makeToast(getActivityContext(), "no internet connection !"));
-    }
-
-
-    @Override
-    public void topRatedMoviesSelected() {
-        if (!isPopularSelected() && new GetNetworkStatus(getActivityContext()).isOnline()) {
-            Log.d(MainActivity.class.getSimpleName(), "popular movie " + isPopularSelected());
-            mModel.loadTopRatedMovies();
-        }
-        else
-            getView().showToast(ToastMaker.makeToast(getActivityContext(), "no internet connection !"));
-    }
-
 
     @Override
     public void setProgressDialogMsg(String msg, ProgressDialog progressDialog) {
@@ -365,15 +343,5 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
             }
         });
 
-    }
-
-    @Override
-    public boolean isPopularSelected() {
-        return isPopularSelected;
-    }
-
-    @Override
-    public void setPopularSelected(boolean popularSelected) {
-        isPopularSelected = popularSelected;
     }
 }

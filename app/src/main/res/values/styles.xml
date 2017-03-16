@@ -67,4 +67,8 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="PrimaryActionButton" parent="AppTheme.Dark">
+        <item name="colorAccent">@color/fab_bg</item>
+    </style>
+
 </resources>

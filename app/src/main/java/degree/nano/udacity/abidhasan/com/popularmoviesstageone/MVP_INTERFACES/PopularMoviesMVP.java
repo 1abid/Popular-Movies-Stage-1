@@ -54,11 +54,6 @@ public class PopularMoviesMVP {
         void setView(RequiredViewOps view);
         boolean onCreateOptionMenu(Menu menu);
 
-        void popularMoviesSelected();
-        void topRatedMoviesSelected();
-
-        boolean isPopularSelected();
-        void setPopularSelected(boolean isPopular);
 
         MovieViewHolder createPopularViewHolder(ViewGroup parent , int viewType);
         void bindPopularViewHolder(MovieViewHolder holder , int position);
