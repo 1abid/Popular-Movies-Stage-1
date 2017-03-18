@@ -7,12 +7,14 @@
         android:layout_width="240dp"
         android:layout_height="140dp"
         android:layout_gravity="center">
-        <ImageView
+        <com.google.android.youtube.player.YouTubeThumbnailView
             android:id="@+id/video_thmb"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/shape_bg_rounded_rect"
             android:orientation="vertical">
-        </ImageView>
+        </com.google.android.youtube.player.YouTubeThumbnailView>
     </android.support.v7.widget.CardView>
+
+
 </FrameLayout>

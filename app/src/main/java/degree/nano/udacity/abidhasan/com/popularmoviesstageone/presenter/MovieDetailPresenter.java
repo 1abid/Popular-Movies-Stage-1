@@ -1,5 +1,6 @@
 package degree.nano.udacity.abidhasan.com.popularmoviesstageone.presenter;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.v7.widget.DividerItemDecoration;
@@ -9,15 +10,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.ViewTarget;
+import com.google.android.youtube.player.YouTubeApiServiceUtil;
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubeThumbnailLoader;
+import com.google.android.youtube.player.YouTubeThumbnailView;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ThumbnailListener;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ToastMaker;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.MovieDetailMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.PopularMoviesMVP;
@@ -36,16 +45,31 @@ import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.MovieTrailer
 
 public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps, MovieDetailMVP.RequiredPresenterOps {
 
+    /** The duration of the animation sliding up the video in portrait. */
+    private static final int ANIMATION_DURATION_MILLIS = 300;
+    /** The padding between the video list and the video in landscape orientation. */
+    private static final int LANDSCAPE_VIDEO_PADDING_DP = 5;
+
+    /** The request code when calling startActivityForResult to recover from an API service error. */
+    private static final int RECOVERY_DIALOG_REQUEST = 1;
+
     private WeakReference<MovieDetailMVP.RequiredViewOps> mView;
 
     private MovieDetailMVP.ProvidedModelOps mModel;
 
     private ArrayList<MovieTrailer> trailers;
 
+    private final ThumbnailListener thumbnailListener;
+    private final Map<YouTubeThumbnailView, YouTubeThumbnailLoader> thumbnailViewToLoaderMap;
+
     public MovieDetailPresenter(MovieDetailMVP.RequiredViewOps mView) {
         this.mView = new WeakReference<MovieDetailMVP.RequiredViewOps>(mView);
 
         trailers = new ArrayList<>();
+
+        thumbnailViewToLoaderMap = new HashMap<>();
+
+        thumbnailListener = new ThumbnailListener(thumbnailViewToLoaderMap);
     }
 
     /**
@@ -86,6 +110,19 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps,
     @Override
     public void setView(MovieDetailMVP.RequiredViewOps view) {
         this.mView = new WeakReference<MovieDetailMVP.RequiredViewOps>(view);
+    }
+
+    @Override
+    public void checkYourYoutubeApi() {
+        YouTubeInitializationResult errorReason =
+                YouTubeApiServiceUtil.isYouTubeApiServiceAvailable(getActivityContext());
+        if (errorReason.isUserRecoverableError()) {
+            errorReason.getErrorDialog((Activity) getView().getActivityContext(), RECOVERY_DIALOG_REQUEST).show();
+        } else if (errorReason != YouTubeInitializationResult.SUCCESS) {
+            String errorMessage =
+                    String.format(getActivityContext().getString(R.string.error_player), errorReason.toString());
+            getView().showToast(ToastMaker.makeToast(getActivityContext(),errorMessage));
+        }
     }
 
 
@@ -137,7 +174,9 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps,
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View v = inflater.inflate(R.layout.movie_trailer_card, parent, false);
 
+
         viewHolder = new MovieTrailerViewHolder(v);
+
 
         return viewHolder;
     }
@@ -149,6 +188,20 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps,
     }
 
     private void bindTrailerData(MovieTrailerViewHolder holder, final MovieTrailer trailer) {
+
+        holder.videoThumb.initialize(API_URLS.YOUTUBE_API_KEY ,thumbnailListener);
+
+        YouTubeThumbnailLoader loader = thumbnailViewToLoaderMap.get(holder.videoThumb);
+        if (loader == null) {
+            // 2) The view is already created, and is currently being initialized. We store the
+            //    current videoId in the tag.
+            holder.videoThumb.setTag(trailer.getVieoKey());
+        } else {
+            // 3) The view is already created and already initialized. Simply set the right videoId
+            //    on the loader.
+            holder.videoThumb.setImageResource(R.drawable.loading_thumbnail);
+            loader.setVideo(trailer.getVieoKey());
+        }
         holder.setListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {

@@ -74,6 +74,7 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
      * movie detail for the movie
      */
     private void showMovieDetails() {
+        mPresenter.checkYourYoutubeApi();
         mPresenter.loadMovieDetail(selectedMovieItem);
     }
 

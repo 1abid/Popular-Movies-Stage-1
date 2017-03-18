@@ -4,6 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.google.android.youtube.player.YouTubeThumbnailView;
+
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.interfaces.OnItemClickListener;
 
@@ -14,19 +16,23 @@ import degree.nano.udacity.abidhasan.com.popularmoviesstageone.interfaces.OnItem
 
 public class MovieTrailerViewHolder extends RecyclerView.ViewHolder {
 
-    public ImageView videoThumb;
+    public YouTubeThumbnailView videoThumb;
 
     public OnItemClickListener clickListener;
 
-    public MovieTrailerViewHolder(View itemView) {
+    public MovieTrailerViewHolder(final View itemView) {
         super(itemView);
 
-        videoThumb = (ImageView) itemView.findViewById(R.id.video_thmb);
+        videoThumb = (YouTubeThumbnailView) itemView.findViewById(R.id.video_thmb);
 
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if(clickListener  != null){
+                    int position = getAdapterPosition();
+                    if(position != RecyclerView.NO_POSITION)
+                        clickListener.onItemClick(itemView , position);
+                }
             }
         });
     }

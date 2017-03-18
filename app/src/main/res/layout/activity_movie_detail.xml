@@ -71,7 +71,7 @@
                 android:id="@+id/releaseDate_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 android:lineSpacingExtra="8dp"
                 android:padding="@dimen/activity_horizontal_margin"/>
 
@@ -80,14 +80,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/releaseDate_tv"
-                android:textSize="20sp"
-                android:lineSpacingExtra="8dp"
-                android:maxLines="4"
+                android:textSize="11sp"
+                android:padding="@dimen/activity_horizontal_margin"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_below="@id/overView_tv"
+                android:id="@+id/trailerTitle"
+                android:textSize="14sp"
+                android:text="Trailers and videos"
                 android:padding="@dimen/activity_horizontal_margin"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/trailerRv"
-                android:layout_below="@id/overView_tv"
+                android:layout_below="@id/trailerTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"></android.support.v7.widget.RecyclerView>

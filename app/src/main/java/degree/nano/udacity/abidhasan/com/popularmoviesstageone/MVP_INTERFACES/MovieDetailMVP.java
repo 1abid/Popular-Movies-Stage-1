@@ -68,6 +68,7 @@ public class MovieDetailMVP {
         void setView(RequiredViewOps view);
 
 
+        void checkYourYoutubeApi();
         void setProgressDialogMsg(String msg );
 
         void loadMovieDetail(MovieGridItem movie);

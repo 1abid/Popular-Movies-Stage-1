@@ -24,6 +24,7 @@
     <string name="menu_settings">Settings</string>
     <string name="dialog_title_list_preference">Select movie sorting options</string>
     <string name="sort_key">movie_sort_settings</string>
+    <string name="error_player">Error creating youtube player (%1$s)</string>
 
     <string-array name="sort_options">
         <item>Popular movies</item>
