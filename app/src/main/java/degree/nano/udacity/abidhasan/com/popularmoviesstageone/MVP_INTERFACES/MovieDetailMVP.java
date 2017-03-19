@@ -3,12 +3,30 @@ package degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.youtube.player.YouTubeThumbnailLoader;
+import com.google.android.youtube.player.YouTubeThumbnailView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ThumbnailListener;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.MovieDetilModels.MovieDetailResponse;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieReviewsModel.Reviews;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieTrailerModel.MovieTrailer;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieTrailerModel.MovieTrailerResponse;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.MovieTrailerViewHolder;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.ReviewViewHolder;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.YoutubeVideoFrgment;
 
 /**
  * Created by VutkaBilai on 3/5/17.
@@ -41,6 +59,19 @@ public class MovieDetailMVP {
         TextView getRatingTv();
         TextView getRelaseDateTv();
         TextView getOverViewTv();
+        RecyclerView getTrailerRV();
+        RecyclerView getReviewRv();
+        String getmovieId();
+
+
+        //youtube video playing
+        YoutubeVideoFrgment getVideoContainer();
+        View getVideoBox();
+        View getCloseButton();
+        void playVideo(String videKey);
+
+        ThumbnailListener getThumbListener();
+        Map<YouTubeThumbnailView, YouTubeThumbnailLoader> getThumbMap();
 
     }
 
@@ -58,9 +89,26 @@ public class MovieDetailMVP {
         void setView(RequiredViewOps view);
 
 
+        void checkYourYoutubeApi();
         void setProgressDialogMsg(String msg );
 
         void loadMovieDetail(MovieGridItem movie);
+
+        void onTrailerDownload(ArrayList<MovieTrailer> trailerArrayList , ArrayList<Reviews> reviewsArrayList);
+
+
+        MovieTrailerViewHolder createTrailerViewHolder(ViewGroup parent , int viewType);
+        void bindTrailerViewHolder(MovieTrailerViewHolder holder , int position);
+        int getTrailerCount();
+
+        ReviewViewHolder createReviewViewHolder(ViewGroup parent , int viewType);
+        void bindReviewViewHolder(ReviewViewHolder holder , int position);
+        int getReviewCount();
+
+        //youtube video playing
+        void onClickClose();
+        void configLayout();
+
     }
 
 
@@ -83,5 +131,10 @@ public class MovieDetailMVP {
         void onDestroy(boolean isConfigurationChanging);
 
         MovieDetailResponse loadMovieDetail(int movieId);
+
+        void getMovieTrailers(String movieId);
+        void getMovieReviews(String movieId);
+
+        int getTrailerItemCount();
     }
 }

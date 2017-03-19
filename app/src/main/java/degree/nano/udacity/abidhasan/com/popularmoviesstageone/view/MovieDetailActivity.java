@@ -3,18 +3,28 @@ package degree.nano.udacity.abidhasan.com.popularmoviesstageone.view;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.youtube.player.YouTubeIntents;
+import com.google.android.youtube.player.YouTubeThumbnailLoader;
+import com.google.android.youtube.player.YouTubeThumbnailView;
 import com.google.gson.Gson;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ActivityFragmentStatemaintainer;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ThumbnailListener;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.MovieDetailMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.MovieDetailModel;
@@ -30,7 +40,8 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
     private Toolbar mToolbar;
 
     private ImageView backDropIv, posterIv;
-    public TextView titleTv , ratingTv , releaseDateTv , overViewTv;
+    public TextView titleTv, ratingTv, releaseDateTv, overViewTv;
+    private RecyclerView trailerRv , reviewRv;
 
     // Responsible to maintain the object's integrity
     // during configurations change
@@ -38,7 +49,14 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
             = new ActivityFragmentStatemaintainer(getFragmentManager(), getClass().getName());
 
     private MovieGridItem selectedMovieItem;
-    private String toolbarTitle , moviegridItem;
+    private String toolbarTitle, moviegridItem;
+
+    private View videoBox;
+    private View closeButton;
+
+    private YoutubeVideoFrgment videoFragment;
+    private ThumbnailListener thumbnailListener;
+    private Map<YouTubeThumbnailView, YouTubeThumbnailLoader> thumbnailViewToLoaderMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,22 +67,34 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
 
         Bundle extras = getIntent().getExtras();
         selectedMovieItem = getSelectedMovieItem(extras);
-        Log.d(getClass().getSimpleName() , "selected movie "+ selectedMovieItem.getMovieId());
+
+        Log.d(getClass().getSimpleName(), "selected movie " + selectedMovieItem.getMovieId());
+
         setUpViews();
 
+        //mPresenter.configLayout();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(getClass().getSimpleName() , "lifecycle_event :onStart()");
+        Log.d(getClass().getSimpleName(), "lifecycle_event :onStart()");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(getClass().getSimpleName() , "lifecycle_event :onResume()");
+        Log.d(getClass().getSimpleName(), "lifecycle_event :onResume()");
         showMovieDetails();
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == MovieDetailPresenter.RECOVERY_DIALOG_REQUEST) {
+            // Recreate the activity if user performed a recovery action
+            recreate();
+        }
     }
 
     /**
@@ -72,7 +102,13 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
      * movie detail for the movie
      */
     private void showMovieDetails() {
+
+        thumbnailViewToLoaderMap = new HashMap<>();
+        thumbnailListener = new ThumbnailListener(thumbnailViewToLoaderMap);
+
+        mPresenter.checkYourYoutubeApi();
         mPresenter.loadMovieDetail(selectedMovieItem);
+
     }
 
     private void setUpViews() {
@@ -86,6 +122,22 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
         releaseDateTv = (TextView) findViewById(R.id.releaseDate_tv);
         overViewTv = (TextView) findViewById(R.id.overView_tv);
 
+        trailerRv = (RecyclerView) findViewById(R.id.trailerRv);
+        reviewRv = (RecyclerView) findViewById(R.id.reviewsrRv);
+
+        videoBox = findViewById(R.id.video_box);
+        closeButton = findViewById(R.id.close_button);
+
+        videoBox.setVisibility(View.INVISIBLE);
+
+        videoFragment = (YoutubeVideoFrgment) getFragmentManager().findFragmentById(R.id.video_fragment_container);
+
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPresenter.onClickClose();
+            }
+        });
 
         /*if(mToolbar !=null)
             setSupportActionBar(mToolbar);
@@ -97,25 +149,27 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(getClass().getSimpleName() , "lifecycle_event :onPause()");
+        Log.d(getClass().getSimpleName(), "lifecycle_event :onPause()");
 
-        if(pDialog != null)
+        if (pDialog != null)
             pDialog.dismiss();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(getClass().getSimpleName() , "lifecycle_event :onStop()");
+        Log.d(getClass().getSimpleName(), "lifecycle_event :onStop()");
 
         mPresenter.onConfigurationChanged(this);
     }
 
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(getClass().getSimpleName() , "lifecycle_event :onDestroy()");
+        Log.d(getClass().getSimpleName(), "lifecycle_event :onDestroy()");
         mPresenter.onDestroy(isChangingConfigurations());
+
     }
 
 
@@ -126,15 +180,15 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
      * Could be done differently,
      * using a dependency injection for example.
      */
-    private void setUpMVP(){
-        try{
-            if(mStateMaintainer.isFirstTimeIn())
+    private void setUpMVP() {
+        try {
+            if (mStateMaintainer.isFirstTimeIn())
                 initialize(this);
             else
                 reInitialize(this);
-        }catch (InstantiationException | IllegalAccessException e){
-            Log.e(getClass().getSimpleName() , "onCreate()"+e.getMessage());
-            throw  new RuntimeException(e);
+        } catch (InstantiationException | IllegalAccessException e) {
+            Log.e(getClass().getSimpleName(), "onCreate()" + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
@@ -145,7 +199,7 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
      * @param view
      */
     private void initialize(MovieDetailMVP.RequiredViewOps view)
-        throws InstantiationException , IllegalAccessException{
+            throws InstantiationException, IllegalAccessException {
 
         //create the presenter
         MovieDetailPresenter presenter = new MovieDetailPresenter(this);
@@ -160,8 +214,8 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
         /**
          * save object {@link ActivityFragmentStatemaintainer}
          */
-        mStateMaintainer.put(MovieDetailMVP.ProviedPresenterOps.class.getSimpleName() , presenter);
-        mStateMaintainer.put(MovieDetailMVP.ProvidedModelOps.class.getSimpleName() ,  model);
+        mStateMaintainer.put(MovieDetailMVP.ProviedPresenterOps.class.getSimpleName(), presenter);
+        mStateMaintainer.put(MovieDetailMVP.ProvidedModelOps.class.getSimpleName(), model);
 
         //set the presenter as a interface
         //to limit communication with it
@@ -174,15 +228,15 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
      * If Presenter has been lost, recreates a instance
      */
     private void reInitialize(MovieDetailMVP.RequiredViewOps view)
-        throws  InstantiationException , IllegalAccessException{
+            throws InstantiationException, IllegalAccessException {
 
         mPresenter = mStateMaintainer.get(MovieDetailMVP.ProviedPresenterOps.class.getSimpleName());
 
-        if(mPresenter == null){
-            Log.e(getClass().getSimpleName() , "didn't get presenter from stateMaintainer");
+        if (mPresenter == null) {
+            Log.e(getClass().getSimpleName(), "didn't get presenter from stateMaintainer");
             initialize(view);
-        }else {
-            Log.d(getClass().getSimpleName() , "reInitializing view ");
+        } else {
+            Log.d(getClass().getSimpleName(), "reInitializing view ");
             mPresenter.onConfigurationChanged(view);
         }
     }
@@ -201,7 +255,7 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
     public ProgressDialog getProgressDialog() {
 
         if (pDialog == null)
-            return pDialog = createProgressDialog() ;
+            return pDialog = createProgressDialog();
 
         return pDialog;
     }
@@ -257,13 +311,58 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
         return overViewTv;
     }
 
+    @Override
+    public RecyclerView getTrailerRV() {
+        return trailerRv;
+    }
+
+    @Override
+    public RecyclerView getReviewRv() {
+        return reviewRv;
+    }
+
+    @Override
+    public String getmovieId() {
+        return Integer.toString(selectedMovieItem.getMovieId());
+    }
+
+    @Override
+    public YoutubeVideoFrgment getVideoContainer() {
+        return videoFragment;
+    }
+
+    @Override
+    public View getVideoBox() {
+        return videoBox;
+    }
+
+    @Override
+    public View getCloseButton() {
+        return closeButton;
+    }
+
+    @Override
+    public void playVideo(String videKey) {
+        startActivity(new Intent(YouTubeIntents.createPlayVideoIntentWithOptions(getAppContext(), videKey, true, false)));
+    }
+
+    @Override
+    public ThumbnailListener getThumbListener() {
+        return thumbnailListener;
+    }
+
+    @Override
+    public Map<YouTubeThumbnailView, YouTubeThumbnailLoader> getThumbMap() {
+        return thumbnailViewToLoaderMap;
+    }
+
 
     private MovieGridItem getSelectedMovieItem(Bundle b) {
 
-        if(b != null)
+        if (b != null)
             moviegridItem = b.getString("movie_item");
 
-        return new Gson().fromJson(moviegridItem , MovieGridItem.class);
+        return new Gson().fromJson(moviegridItem, MovieGridItem.class);
     }
 
     public ProgressDialog createProgressDialog() {

@@ -19,4 +19,24 @@
     <string name="wrong_pass_length">password length must be 4 to 10 alphanumeric characters</string>
     <string name="log_failed">log in failed</string>
     <string name="log_in_success">Successfully logged in</string>
+
+    //settings
+    <string name="menu_settings">Settings</string>
+    <string name="dialog_title_list_preference">Select movie sorting options</string>
+    <string name="sort_key">movie_sort_settings</string>
+    <string name="error_player">Error creating youtube player (%1$s)</string>
+    <string name="trailers_and_videos">Trailers and videos</string>
+    <string name="movie_review">Reviews</string>
+
+    <string-array name="sort_options">
+        <item>Popular movies</item>
+        <item>Top rated movies</item>
+        <item>Favourite movies</item>
+    </string-array>
+
+    <string-array name="sort_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
 </resources>

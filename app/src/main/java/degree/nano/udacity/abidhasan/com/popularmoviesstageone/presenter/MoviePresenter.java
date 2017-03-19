@@ -54,12 +54,9 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
     private PopularMovieAdapter popularMovieadpter;
     private TopRatedMovieAdapter topRatedMovieAdapter;
-    private RecyclerView movieRV;
 
     private List<MovieGridItem> mPopularMovies;
     private List<MovieGridItem> mTopRatedMovies;
-
-    private boolean isPopularSelected = true;
 
 
     public MoviePresenter(PopularMoviesMVP.RequiredViewOps mView) {
@@ -130,24 +127,6 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     }
 
     @Override
-    public void popularMoviesSelected() {
-        if (isPopularSelected() && new GetNetworkStatus(getActivityContext()).isOnline())
-            mModel.loadPopularMovies();
-        else
-            getView().showToast(ToastMaker.makeToast(getActivityContext(), "no internet connection !"));
-    }
-
-
-    @Override
-    public void topRatedMoviesSelected() {
-        if (!isPopularSelected() && new GetNetworkStatus(getActivityContext()).isOnline())
-            mModel.loadTopRatedMovies();
-        else
-            getView().showToast(ToastMaker.makeToast(getActivityContext(), "no internet connection !"));
-    }
-
-
-    @Override
     public void setProgressDialogMsg(String msg, ProgressDialog progressDialog) {
         getView().getProgressDialog().setMessage(msg);
     }
@@ -179,23 +158,14 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
     public void showPopularMovies() {
 
-
-        movieRV = getView().getRecyclrView();
-
-        GridLayoutManager mLayoutManager = new GridLayoutManager(getActivityContext(), 2);
-        movieRV.setLayoutManager(mLayoutManager);
-
-        int spacingInPixels = getAppContext().getResources().getDimensionPixelSize(R.dimen.grid_item_space);
-        movieRV.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));
-
-
         if (mPopularMovies.size() == 0)
             addPopularMovieGriditem();
 
         popularMovieadpter = new PopularMovieAdapter(this);
-        movieRV.setAdapter(popularMovieadpter);
+        getView().getRecyclrView().setAdapter(popularMovieadpter);
 
         popularMovieadpter.notifyDataSetChanged();
+
     }
 
 
@@ -206,8 +176,21 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
             addTopRatedMoviesGridItem();
 
         topRatedMovieAdapter = new TopRatedMovieAdapter(this);
-        movieRV.swapAdapter(topRatedMovieAdapter, true);
+        getView().getRecyclrView().swapAdapter(topRatedMovieAdapter, true);
         topRatedMovieAdapter.notifyDataSetChanged();
+
+    }
+
+    @Override
+    public void initializeRecyclerView(){
+
+        RecyclerView movieRV = getView().getRecyclrView();
+
+        GridLayoutManager mLayoutManager = new GridLayoutManager(getActivityContext(), 2);
+        movieRV.setLayoutManager(mLayoutManager);
+
+        int spacingInPixels = getAppContext().getResources().getDimensionPixelSize(R.dimen.grid_item_space);
+        movieRV.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));
     }
 
     /**
@@ -360,15 +343,5 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
             }
         });
 
-    }
-
-    @Override
-    public boolean isPopularSelected() {
-        return isPopularSelected;
-    }
-
-    @Override
-    public void setPopularSelected(boolean popularSelected) {
-        isPopularSelected = popularSelected;
     }
 }

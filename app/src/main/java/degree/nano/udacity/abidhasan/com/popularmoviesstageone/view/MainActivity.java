@@ -4,9 +4,11 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -43,7 +45,8 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
         super.onCreate(savedInstanceState);
 
         setUpMvp();
-        Log.d(getClass().getSimpleName() , "lifecycle_event :onCreate()");
+        Log.d(getClass().getSimpleName(), "lifecycle_event :onCreate()");
+
         setContentView(R.layout.activity_main);
         setUpViews();
 
@@ -52,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(getClass().getSimpleName() , "lifecycle_event :onStart()");
+        Log.d(getClass().getSimpleName(), "lifecycle_event :onStart()");
 
     }
 
@@ -60,19 +63,33 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(getClass().getSimpleName() , "lifecycle_event :onResume()");
-        showPopularMovies();
+        Log.d(getClass().getSimpleName(), "lifecycle_event :onResume()");
+
+        showPopularMovies(getSortType());
+    }
+
+    private String getSortType(){
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivityContext());
+
+        return sharedPreferences.getString(getString(R.string.sort_key) , "1");
     }
 
     /**
      * tells presenter
      * to load popularmoies
      */
-    private void showPopularMovies() {
+    private void showPopularMovies(String sortID) {
 
-        if (new GetNetworkStatus(getActivityContext()).isOnline())
-            mPresenter.loadPopularMovies();
-        else
+        if (new GetNetworkStatus(getActivityContext()).isOnline()) {
+            if ("1".equals(sortID)) {
+                Log.d(getClass().getSimpleName(), "popular selected");
+                mPresenter.loadPopularMovies();
+            } else {
+                Log.d(getClass().getSimpleName(), "Toprated selected");
+                mPresenter.loadTopRatedMovies();
+            }
+        } else
             showToast(ToastMaker.makeToast(getActivityContext(), " No internetConnection !"));
     }
 
@@ -81,6 +98,8 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         movieRecyclerView = (RecyclerView) findViewById(R.id.rvMovies);
+
+        mPresenter.initializeRecyclerView();
 
         if (pDailog == null)
             pDailog = createProgressDialog();
@@ -94,29 +113,26 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(getClass().getSimpleName() , "lifecycle_event :onPause()");
+        Log.d(getClass().getSimpleName(), "lifecycle_event :onPause()");
 
-        if(pDailog!=null)
+        if (pDailog != null)
             pDailog.dismiss();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(getClass().getSimpleName() , "lifecycle_event :onStop()");
+        Log.d(getClass().getSimpleName(), "lifecycle_event :onStop()");
+
         mPresenter.onConfigurationChanged(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(getClass().getSimpleName() , "lifecycle_event :onDestroy()");
+        Log.d(getClass().getSimpleName(), "lifecycle_event :onDestroy()");
         mPresenter.onDestroy(isChangingConfigurations());
     }
-
-
-
-
 
 
     @Override
@@ -129,17 +145,15 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
 
         switch (item.getItemId()) {
-            case R.id.popular_movies:
-                mPresenter.setPopularSelected(true);
-                mPresenter.popularMoviesSelected();
 
-            case R.id.toprated_movies:
-                mPresenter.setPopularSelected(false);
-                mPresenter.topRatedMoviesSelected();
+            case R.id.setting_menu:
+                startActivity(new Intent(this , SettingsActivity.class));
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
+
 
     }
 
@@ -158,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
                 initilize(this);
 
             } else {
-                Log.d(getClass().getSimpleName() , " reinitializing...");
+                Log.d(getClass().getSimpleName(), " reinitializing...");
                 reInitialize(this);
             }
         } catch (InstantiationException | IllegalAccessException e) {
@@ -207,13 +221,10 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
 
         mPresenter = mStateMaintainer.get(PopularMoviesMVP.ProvidedPresenterOps.class.getSimpleName());
 
-        if (mPresenter == null) {
-            Log.d(getClass().getSimpleName(), "Ininitalizing view");
+        if (mPresenter == null)
             initilize(view);
-        } else {
-            Log.d(getClass().getSimpleName(), "reinitalizing view");
+        else
             mPresenter.onConfigurationChanged(this);
-        }
     }
 
     @Override
@@ -266,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     }
 
 
-    private ProgressDialog createProgressDialog(){
+    private ProgressDialog createProgressDialog() {
         pDailog = new ProgressDialog(getActivityContext()
                 , R.style.AppTheme_Dark_Dialog);
 
@@ -279,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
     @Override
     public RecyclerView getRecyclrView() {
 
-        if(movieRecyclerView == null) {
+        if (movieRecyclerView == null) {
 
             return movieRecyclerView = (RecyclerView) findViewById(R.id.rvMovies);
         }

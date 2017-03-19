@@ -1,8 +1,18 @@
 package degree.nano.udacity.abidhasan.com.popularmoviesstageone.model;
 
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Application.RestServiceGenerator;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ToastMaker;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.MovieDetailMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.MovieDetilModels.MovieDetailResponse;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieReviewsModel.MovieReviewResponse;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieReviewsModel.Reviews;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieTrailerModel.MovieTrailer;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieTrailerModel.MovieTrailerResponse;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.presenter.MovieDetailPresenter;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.rest.TmdbApiInterface;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.util.API_URLS;
@@ -19,14 +29,16 @@ public class MovieDetailModel implements MovieDetailMVP.ProvidedModelOps {
     private MovieDetailMVP.ProviedPresenterOps mPresenter;
     private MovieDetailPresenter movieDetailPresenter;
 
+    private ArrayList<MovieTrailer> trailerList;
+    private ArrayList<Reviews> reviewList;
 
     public MovieDetailModel(MovieDetailMVP.ProviedPresenterOps mPresenter) {
 
         this.mPresenter = mPresenter;
         movieDetailPresenter = (MovieDetailPresenter) mPresenter;
 
-
-
+        trailerList = new ArrayList<>();
+        reviewList = new ArrayList<>();
     }
 
     @Override
@@ -38,32 +50,81 @@ public class MovieDetailModel implements MovieDetailMVP.ProvidedModelOps {
     @Override
     public MovieDetailResponse loadMovieDetail(int movieId) {
 
-        /*movieDetailPresenter.setProgressDialogMsg("loading...");
-        movieDetailPresenter.getView().showProgressDialog();
+
+        return null;
+    }
+
+    @Override
+    public void getMovieTrailers(final String movieId) {
 
 
         TmdbApiInterface apiInterface = RestServiceGenerator.createService(TmdbApiInterface.class);
 
-        Call<MovieDetailResponse> movieDetailCall = apiInterface.getMovieDetail(movieId , API_URLS.TMDB_API_KEY);
+        final Call<MovieTrailerResponse> trailers = apiInterface.getTrailers(movieId,API_URLS.TMDB_API_KEY);
 
-
-        movieDetailCall.enqueue(new Callback<MovieDetailResponse>() {
+        trailers.enqueue(new Callback<MovieTrailerResponse>() {
             @Override
-            public void onResponse(Call<MovieDetailResponse> call, Response<MovieDetailResponse> response) {
+            public void onResponse(Call<MovieTrailerResponse> call, Response<MovieTrailerResponse> response) {
+
+                    if(response.isSuccessful()){
+
+                    addMovieTrailers(response.body().getTrailers());
+
+                    getMovieReviews(movieId);
+                    }else {
+                        movieDetailPresenter.getView().showToast(ToastMaker.makeToast(movieDetailPresenter.getActivityContext()
+                                ,"something went wrong !"));
+                    }
+            }
+
+            @Override
+            public void onFailure(Call<MovieTrailerResponse> call, Throwable t) {
+                movieDetailPresenter.getView().hideProgressDialog();
+            }
+        });
+    }
+
+    @Override
+    public void getMovieReviews(String movieId) {
+
+        TmdbApiInterface apiInterface = RestServiceGenerator.createService(TmdbApiInterface.class);
+
+        final Call<MovieReviewResponse> reviews = apiInterface.getReviews(Integer.valueOf(movieId) , API_URLS.TMDB_API_KEY);
+
+        reviews.enqueue(new Callback<MovieReviewResponse>() {
+            @Override
+            public void onResponse(Call<MovieReviewResponse> call, Response<MovieReviewResponse> response) {
 
                 if(response.isSuccessful()){
 
+                    addReviews(response.body().getReviewsList());
                     movieDetailPresenter.getView().hideProgressDialog();
 
+                    movieDetailPresenter.onTrailerDownload(trailerList,reviewList);
 
+                }else {
+                    movieDetailPresenter.getView().showToast(ToastMaker.makeToast(movieDetailPresenter.getActivityContext()
+                            ,"something went wrong !"));
                 }
             }
 
             @Override
-            public void onFailure(Call<MovieDetailResponse> call, Throwable t) {
-
+            public void onFailure(Call<MovieReviewResponse> call, Throwable t) {
+                movieDetailPresenter.getView().hideProgressDialog();
             }
-        });*/
-        return null;
+        });
+    }
+
+    @Override
+    public int getTrailerItemCount() {
+        return trailerList.size() == 0 ? 0 : trailerList.size() ;
+    }
+
+    private void addMovieTrailers(ArrayList<MovieTrailer> trailers) {
+        this.trailerList = trailers;
+    }
+
+    private void addReviews(List<Reviews> reviewsList){
+        this.reviewList = (ArrayList<Reviews>) reviewsList;
     }
 }
