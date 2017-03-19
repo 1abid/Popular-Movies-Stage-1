@@ -59,8 +59,7 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
  */
 
 public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
-        , MovieDetailMVP.RequiredPresenterOps , YouTubePlayer.OnFullscreenListener{
-
+        , MovieDetailMVP.RequiredPresenterOps, YouTubePlayer.OnFullscreenListener {
 
 
     private WeakReference<MovieDetailMVP.RequiredViewOps> mView;
@@ -68,17 +67,22 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
     private MovieDetailMVP.ProvidedModelOps mModel;
 
     private ArrayList<MovieTrailer> trailers;
+    private TrailerAdpter adapter;
 
-    private final ThumbnailListener thumbnailListener;
-    private final Map<YouTubeThumbnailView, YouTubeThumbnailLoader> thumbnailViewToLoaderMap;
 
     /**youtube video loading**/
-    /** The duration of the animation sliding up the video in portrait. */
+    /**
+     * The duration of the animation sliding up the video in portrait.
+     */
     public static final int ANIMATION_DURATION_MILLIS = 300;
-    /** The padding between the video list and the video in landscape orientation. */
+    /**
+     * The padding between the video list and the video in landscape orientation.
+     */
     public static final int LANDSCAPE_VIDEO_PADDING_DP = 5;
 
-    /** The request code when calling startActivityForResult to recover from an API service error. */
+    /**
+     * The request code when calling startActivityForResult to recover from an API service error.
+     */
     public static final int RECOVERY_DIALOG_REQUEST = 1;
 
     private boolean isFullscreen;
@@ -90,9 +94,6 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
 
         trailers = new ArrayList<>();
 
-        thumbnailViewToLoaderMap = new HashMap<>();
-
-        thumbnailListener = new ThumbnailListener(thumbnailViewToLoaderMap);
         layoutUtil = new LayoutUtil(getAppContext());
     }
 
@@ -118,11 +119,14 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
         if (!isChangingConfigurations) {
             mModel = null;
         }
+
+
     }
 
     @Override
     public void onConfigurationChanged(MovieDetailMVP.RequiredViewOps view) {
         setView(view);
+
         //configLayout();
     }
 
@@ -146,7 +150,7 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
         } else if (errorReason != YouTubeInitializationResult.SUCCESS) {
             String errorMessage =
                     String.format(getActivityContext().getString(R.string.error_player), errorReason.toString());
-            getView().showToast(ToastMaker.makeToast(getActivityContext(),errorMessage));
+            getView().showToast(ToastMaker.makeToast(getActivityContext(), errorMessage));
         }
     }
 
@@ -169,8 +173,7 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
         loadImage(getView().getBackdropImageView(), movie.getMovieBackDropPath());
         loadImage(getView().getPosterImageView(), movie.getMoviePosterPath());
 
-        if (trailers.size() == 0)
-            mModel.getMovieTrailers(getView().getmovieId());
+        mModel.getMovieTrailers(getView().getmovieId());
     }
 
     @Override
@@ -185,7 +188,8 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivityContext(), LinearLayoutManager.HORIZONTAL, false);
         trailerRV.setLayoutManager(layoutManager);
-        trailerRV.setAdapter(new TrailerAdpter(this));
+        adapter = new TrailerAdpter(this);
+        trailerRV.setAdapter(adapter);
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(trailerRV.getContext(),
                 layoutManager.getOrientation());
@@ -209,14 +213,14 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
     @Override
     public void bindTrailerViewHolder(MovieTrailerViewHolder holder, int position) {
         MovieTrailer trailer = trailers.get(position);
-        bindTrailerData(holder , trailer);
+        bindTrailerData(holder, trailer);
     }
 
     private void bindTrailerData(MovieTrailerViewHolder holder, final MovieTrailer trailer) {
 
-        holder.videoThumb.initialize(API_URLS.YOUTUBE_API_KEY ,thumbnailListener);
+        holder.videoThumb.initialize(API_URLS.YOUTUBE_API_KEY, getView().getThumbListener());
 
-        YouTubeThumbnailLoader loader = thumbnailViewToLoaderMap.get(holder.videoThumb);
+        YouTubeThumbnailLoader loader = getView().getThumbMap().get(holder.videoThumb);
         if (loader == null) {
             // 2) The view is already created, and is currently being initialized. We store the
             //    current videoId in the tag.
@@ -395,7 +399,7 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
 
     @Override
     public void onFullscreen(boolean b) {
-        this.isFullscreen = b ;
+        this.isFullscreen = b;
 
         //configLayout();
     }

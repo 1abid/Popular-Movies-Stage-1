@@ -16,9 +16,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.youtube.player.YouTubeIntents;
+import com.google.android.youtube.player.YouTubeThumbnailLoader;
+import com.google.android.youtube.player.YouTubeThumbnailView;
 import com.google.gson.Gson;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ActivityFragmentStatemaintainer;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ThumbnailListener;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.MovieDetailMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.MovieDetailModel;
@@ -49,7 +55,8 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
     private View closeButton;
 
     private YoutubeVideoFrgment videoFragment;
-
+    private ThumbnailListener thumbnailListener;
+    private Map<YouTubeThumbnailView, YouTubeThumbnailLoader> thumbnailViewToLoaderMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,8 +101,13 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
      * movie detail for the movie
      */
     private void showMovieDetails() {
+
+        thumbnailViewToLoaderMap = new HashMap<>();
+        thumbnailListener = new ThumbnailListener(thumbnailViewToLoaderMap);
+
         mPresenter.checkYourYoutubeApi();
         mPresenter.loadMovieDetail(selectedMovieItem);
+
     }
 
     private void setUpViews() {
@@ -149,11 +161,13 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
         mPresenter.onConfigurationChanged(this);
     }
 
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.d(getClass().getSimpleName(), "lifecycle_event :onDestroy()");
         mPresenter.onDestroy(isChangingConfigurations());
+
     }
 
 
@@ -322,7 +336,17 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
 
     @Override
     public void playVideo(String videKey) {
-        startActivity(new Intent(YouTubeIntents.createPlayVideoIntentWithOptions(getActivityContext(), videKey, true, false)));
+        startActivity(new Intent(YouTubeIntents.createPlayVideoIntentWithOptions(getAppContext(), videKey, true, false)));
+    }
+
+    @Override
+    public ThumbnailListener getThumbListener() {
+        return thumbnailListener;
+    }
+
+    @Override
+    public Map<YouTubeThumbnailView, YouTubeThumbnailLoader> getThumbMap() {
+        return thumbnailViewToLoaderMap;
     }
 
 
