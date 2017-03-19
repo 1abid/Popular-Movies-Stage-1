@@ -9,6 +9,8 @@ import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Application.RestS
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ToastMaker;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.MovieDetailMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.MovieDetilModels.MovieDetailResponse;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieReviewsModel.MovieReviewResponse;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieReviewsModel.Reviews;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieTrailerModel.MovieTrailer;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieTrailerModel.MovieTrailerResponse;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.presenter.MovieDetailPresenter;
@@ -28,6 +30,7 @@ public class MovieDetailModel implements MovieDetailMVP.ProvidedModelOps {
     private MovieDetailPresenter movieDetailPresenter;
 
     private ArrayList<MovieTrailer> trailerList;
+    private ArrayList<Reviews> reviewList;
 
     public MovieDetailModel(MovieDetailMVP.ProviedPresenterOps mPresenter) {
 
@@ -35,6 +38,7 @@ public class MovieDetailModel implements MovieDetailMVP.ProvidedModelOps {
         movieDetailPresenter = (MovieDetailPresenter) mPresenter;
 
         trailerList = new ArrayList<>();
+        reviewList = new ArrayList<>();
     }
 
     @Override
@@ -51,7 +55,7 @@ public class MovieDetailModel implements MovieDetailMVP.ProvidedModelOps {
     }
 
     @Override
-    public List<MovieTrailer> getMovieTrailers(String movieId) {
+    public void getMovieTrailers(final String movieId) {
 
 
         TmdbApiInterface apiInterface = RestServiceGenerator.createService(TmdbApiInterface.class);
@@ -63,10 +67,10 @@ public class MovieDetailModel implements MovieDetailMVP.ProvidedModelOps {
             public void onResponse(Call<MovieTrailerResponse> call, Response<MovieTrailerResponse> response) {
 
                     if(response.isSuccessful()){
-                    addMovieTrailers(response.body().getTrailers());
-                    movieDetailPresenter.getView().hideProgressDialog();
 
-                    movieDetailPresenter.onTrailerDownload(trailerList);
+                    addMovieTrailers(response.body().getTrailers());
+
+                    getMovieReviews(movieId);
                     }else {
                         movieDetailPresenter.getView().showToast(ToastMaker.makeToast(movieDetailPresenter.getActivityContext()
                                 ,"something went wrong !"));
@@ -78,7 +82,37 @@ public class MovieDetailModel implements MovieDetailMVP.ProvidedModelOps {
                 movieDetailPresenter.getView().hideProgressDialog();
             }
         });
-        return trailerList;
+    }
+
+    @Override
+    public void getMovieReviews(String movieId) {
+
+        TmdbApiInterface apiInterface = RestServiceGenerator.createService(TmdbApiInterface.class);
+
+        final Call<MovieReviewResponse> reviews = apiInterface.getReviews(Integer.valueOf(movieId) , API_URLS.TMDB_API_KEY);
+
+        reviews.enqueue(new Callback<MovieReviewResponse>() {
+            @Override
+            public void onResponse(Call<MovieReviewResponse> call, Response<MovieReviewResponse> response) {
+
+                if(response.isSuccessful()){
+
+                    addReviews(response.body().getReviewsList());
+                    movieDetailPresenter.getView().hideProgressDialog();
+
+                    movieDetailPresenter.onTrailerDownload(trailerList,reviewList);
+
+                }else {
+                    movieDetailPresenter.getView().showToast(ToastMaker.makeToast(movieDetailPresenter.getActivityContext()
+                            ,"something went wrong !"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MovieReviewResponse> call, Throwable t) {
+                movieDetailPresenter.getView().hideProgressDialog();
+            }
+        });
     }
 
     @Override
@@ -90,5 +124,7 @@ public class MovieDetailModel implements MovieDetailMVP.ProvidedModelOps {
         this.trailerList = trailers;
     }
 
-
+    private void addReviews(List<Reviews> reviewsList){
+        this.reviewList = (ArrayList<Reviews>) reviewsList;
+    }
 }

@@ -21,9 +21,11 @@ import java.util.Map;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ThumbnailListener;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.MovieDetilModels.MovieDetailResponse;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieReviewsModel.Reviews;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieTrailerModel.MovieTrailer;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieTrailerModel.MovieTrailerResponse;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.MovieTrailerViewHolder;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.ReviewViewHolder;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.YoutubeVideoFrgment;
 
 /**
@@ -58,7 +60,9 @@ public class MovieDetailMVP {
         TextView getRelaseDateTv();
         TextView getOverViewTv();
         RecyclerView getTrailerRV();
+        RecyclerView getReviewRv();
         String getmovieId();
+
 
         //youtube video playing
         YoutubeVideoFrgment getVideoContainer();
@@ -90,12 +94,16 @@ public class MovieDetailMVP {
 
         void loadMovieDetail(MovieGridItem movie);
 
-        void onTrailerDownload(ArrayList<MovieTrailer> trailerArrayList);
+        void onTrailerDownload(ArrayList<MovieTrailer> trailerArrayList , ArrayList<Reviews> reviewsArrayList);
 
 
         MovieTrailerViewHolder createTrailerViewHolder(ViewGroup parent , int viewType);
         void bindTrailerViewHolder(MovieTrailerViewHolder holder , int position);
         int getTrailerCount();
+
+        ReviewViewHolder createReviewViewHolder(ViewGroup parent , int viewType);
+        void bindReviewViewHolder(ReviewViewHolder holder , int position);
+        int getReviewCount();
 
         //youtube video playing
         void onClickClose();
@@ -124,7 +132,8 @@ public class MovieDetailMVP {
 
         MovieDetailResponse loadMovieDetail(int movieId);
 
-        List<MovieTrailer> getMovieTrailers(String movieId);
+        void getMovieTrailers(String movieId);
+        void getMovieReviews(String movieId);
 
         int getTrailerItemCount();
     }

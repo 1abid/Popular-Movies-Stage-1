@@ -6,6 +6,7 @@ import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
+import android.util.Log;
 
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
 
@@ -46,6 +47,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             ListPreference listPreference = (ListPreference) preference;
             int prefIndex = listPreference.findIndexOfValue(sharedPreferences.getString(s, ""));
             if (prefIndex >= 0) {
+                Log.d(TAG , "preference changed"+listPreference.getEntries()[prefIndex]);
                 preference.setSummary(listPreference.getEntries()[prefIndex]);
             }
         } else {

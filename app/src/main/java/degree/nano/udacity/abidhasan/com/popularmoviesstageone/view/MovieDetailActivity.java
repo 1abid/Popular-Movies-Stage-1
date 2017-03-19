@@ -41,7 +41,7 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
 
     private ImageView backDropIv, posterIv;
     public TextView titleTv, ratingTv, releaseDateTv, overViewTv;
-    private RecyclerView trailerRv;
+    private RecyclerView trailerRv , reviewRv;
 
     // Responsible to maintain the object's integrity
     // during configurations change
@@ -67,6 +67,7 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
 
         Bundle extras = getIntent().getExtras();
         selectedMovieItem = getSelectedMovieItem(extras);
+
         Log.d(getClass().getSimpleName(), "selected movie " + selectedMovieItem.getMovieId());
 
         setUpViews();
@@ -122,6 +123,7 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
         overViewTv = (TextView) findViewById(R.id.overView_tv);
 
         trailerRv = (RecyclerView) findViewById(R.id.trailerRv);
+        reviewRv = (RecyclerView) findViewById(R.id.reviewsrRv);
 
         videoBox = findViewById(R.id.video_box);
         closeButton = findViewById(R.id.close_button);
@@ -312,6 +314,11 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
     @Override
     public RecyclerView getTrailerRV() {
         return trailerRv;
+    }
+
+    @Override
+    public RecyclerView getReviewRv() {
+        return reviewRv;
     }
 
     @Override

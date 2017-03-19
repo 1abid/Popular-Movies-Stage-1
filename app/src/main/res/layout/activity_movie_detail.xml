@@ -89,7 +89,7 @@
                 android:layout_below="@id/overView_tv"
                 android:id="@+id/trailerTitle"
                 android:textSize="14sp"
-                android:text="Trailers and videos"
+                android:text="@string/trailers_and_videos"
                 android:padding="@dimen/activity_horizontal_margin"/>
 
             <android.support.v7.widget.RecyclerView
@@ -99,9 +99,28 @@
                 android:layout_height="wrap_content"
                 android:padding="10dp"></android.support.v7.widget.RecyclerView>
 
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_below="@id/trailerRv"
+                android:id="@+id/reviewTitle"
+                android:textSize="14sp"
+                android:text="@string/movie_review"
+                android:padding="@dimen/activity_horizontal_margin"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/reviewsrRv"
+                android:layout_below="@id/reviewTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"></android.support.v7.widget.RecyclerView>
+
+
+
             <LinearLayout
                 android:id="@+id/video_box"
-                android:layout_below="@+id/trailerRv"
+                android:layout_below="@+id/reviewsrRv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"

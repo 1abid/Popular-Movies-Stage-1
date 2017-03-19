@@ -4,9 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.support.v7.widget.DividerItemDecoration;
@@ -18,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -26,30 +23,25 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.ViewTarget;
 import com.google.android.youtube.player.YouTubeApiServiceUtil;
 import com.google.android.youtube.player.YouTubeInitializationResult;
-import com.google.android.youtube.player.YouTubeIntents;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubeThumbnailLoader;
-import com.google.android.youtube.player.YouTubeThumbnailView;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.LayoutUtil;
-import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ThumbnailListener;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ToastMaker;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.MovieDetailMVP;
-import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.PopularMoviesMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.adapters.ReviewAdapter;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.adapters.TrailerAdpter;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.interfaces.OnItemClickListener;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieReviewsModel.Reviews;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieTrailerModel.MovieTrailer;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.util.API_URLS;
-import degree.nano.udacity.abidhasan.com.popularmoviesstageone.util.GridSpacingItemDecoration;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.MovieTrailerViewHolder;
-import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.YoutubeVideoFrgment;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.ReviewViewHolder;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -67,7 +59,11 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
     private MovieDetailMVP.ProvidedModelOps mModel;
 
     private ArrayList<MovieTrailer> trailers;
-    private TrailerAdpter adapter;
+    private ArrayList<Reviews> reviewes;
+
+    private TrailerAdpter trailerAdpter;
+    private ReviewAdapter reviewAdapter;
+
 
 
     /**youtube video loading**/
@@ -93,6 +89,7 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
         this.mView = new WeakReference<MovieDetailMVP.RequiredViewOps>(mView);
 
         trailers = new ArrayList<>();
+        reviewes = new ArrayList<>();
 
         layoutUtil = new LayoutUtil(getAppContext());
     }
@@ -177,24 +174,34 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
     }
 
     @Override
-    public void onTrailerDownload(ArrayList<MovieTrailer> trailerArrayList) {
+    public void onTrailerDownload(ArrayList<MovieTrailer> trailerArrayList ,ArrayList<Reviews> reviewsArrayList) {
 
         trailers = trailerArrayList;
+        reviewes = reviewsArrayList;
 
-        InitializeRv(getView().getTrailerRV());
+        trailerAdpter = new TrailerAdpter(this);
+        RecyclerView trailerRv = InitializeRv(getView().getTrailerRV() , LinearLayoutManager.HORIZONTAL);
+        trailerRv.setAdapter(trailerAdpter);
+
+        reviewAdapter = new ReviewAdapter(this);
+        RecyclerView reviewRv = InitializeRv(getView().getReviewRv() ,LinearLayoutManager.VERTICAL);
+        reviewRv.setAdapter(reviewAdapter);
     }
 
-    private void InitializeRv(RecyclerView trailerRV) {
+    private RecyclerView InitializeRv(RecyclerView rv , int orientation) {
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivityContext(), LinearLayoutManager.HORIZONTAL, false);
-        trailerRV.setLayoutManager(layoutManager);
-        adapter = new TrailerAdpter(this);
-        trailerRV.setAdapter(adapter);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivityContext(), orientation, false);
+        rv.setLayoutManager(layoutManager);
 
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(trailerRV.getContext(),
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rv.getContext(),
                 layoutManager.getOrientation());
-        trailerRV.addItemDecoration(dividerItemDecoration);
+        rv.addItemDecoration(dividerItemDecoration);
+
+
+        return rv;
     }
+
+
 
     @Override
     public MovieTrailerViewHolder createTrailerViewHolder(ViewGroup parent, int viewType) {
@@ -264,6 +271,33 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
     @Override
     public int getTrailerCount() {
         return trailers.size();
+    }
+
+    @Override
+    public ReviewViewHolder createReviewViewHolder(ViewGroup parent, int viewType) {
+
+        ReviewViewHolder viewHolder;
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        View v = inflater.inflate(R.layout.review_item, parent, false);
+
+
+        viewHolder = new ReviewViewHolder(v);
+
+
+        return viewHolder;
+    }
+
+    @Override
+    public void bindReviewViewHolder(ReviewViewHolder holder, int position) {
+        Reviews review = reviewes.get(position);
+
+        holder.authNameTv.setText(review.getAuthor());
+        holder.contenctTv.setText(review.getContent());
+    }
+
+    @Override
+    public int getReviewCount() {
+        return reviewes.size();
     }
 
     @Override
