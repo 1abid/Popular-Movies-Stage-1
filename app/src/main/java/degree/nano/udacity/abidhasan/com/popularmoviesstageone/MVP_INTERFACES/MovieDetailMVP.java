@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopR
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieTrailerModel.MovieTrailer;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieTrailerModel.MovieTrailerResponse;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.MovieTrailerViewHolder;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.YoutubeVideoFrgment;
 
 /**
  * Created by VutkaBilai on 3/5/17.
@@ -52,6 +54,12 @@ public class MovieDetailMVP {
         RecyclerView getTrailerRV();
         String getmovieId();
 
+        //youtube video playing
+        YoutubeVideoFrgment getVideoContainer();
+        View getVideoBox();
+        View getCloseButton();
+        void playVideo(String videKey);
+
     }
 
 
@@ -79,6 +87,10 @@ public class MovieDetailMVP {
         MovieTrailerViewHolder createTrailerViewHolder(ViewGroup parent , int viewType);
         void bindTrailerViewHolder(MovieTrailerViewHolder holder , int position);
         int getTrailerCount();
+
+        //youtube video playing
+        void onClickClose();
+        void configLayout();
 
     }
 

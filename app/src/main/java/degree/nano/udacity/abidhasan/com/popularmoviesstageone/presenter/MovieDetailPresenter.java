@@ -1,14 +1,22 @@
 package degree.nano.udacity.abidhasan.com.popularmoviesstageone.presenter;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.os.Build;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -18,6 +26,8 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.ViewTarget;
 import com.google.android.youtube.player.YouTubeApiServiceUtil;
 import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubeIntents;
+import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubeThumbnailLoader;
 import com.google.android.youtube.player.YouTubeThumbnailView;
 
@@ -26,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.LayoutUtil;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ThumbnailListener;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ToastMaker;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.MovieDetailMVP;
@@ -38,20 +49,19 @@ import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieTraile
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.util.API_URLS;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.util.GridSpacingItemDecoration;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.MovieTrailerViewHolder;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.YoutubeVideoFrgment;
+
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 /**
  * Created by abidhasan on 3/6/17.
  */
 
-public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps, MovieDetailMVP.RequiredPresenterOps {
+public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
+        , MovieDetailMVP.RequiredPresenterOps , YouTubePlayer.OnFullscreenListener{
 
-    /** The duration of the animation sliding up the video in portrait. */
-    private static final int ANIMATION_DURATION_MILLIS = 300;
-    /** The padding between the video list and the video in landscape orientation. */
-    private static final int LANDSCAPE_VIDEO_PADDING_DP = 5;
 
-    /** The request code when calling startActivityForResult to recover from an API service error. */
-    private static final int RECOVERY_DIALOG_REQUEST = 1;
 
     private WeakReference<MovieDetailMVP.RequiredViewOps> mView;
 
@@ -62,6 +72,19 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps,
     private final ThumbnailListener thumbnailListener;
     private final Map<YouTubeThumbnailView, YouTubeThumbnailLoader> thumbnailViewToLoaderMap;
 
+    /**youtube video loading**/
+    /** The duration of the animation sliding up the video in portrait. */
+    public static final int ANIMATION_DURATION_MILLIS = 300;
+    /** The padding between the video list and the video in landscape orientation. */
+    public static final int LANDSCAPE_VIDEO_PADDING_DP = 5;
+
+    /** The request code when calling startActivityForResult to recover from an API service error. */
+    public static final int RECOVERY_DIALOG_REQUEST = 1;
+
+    private boolean isFullscreen;
+
+    private LayoutUtil layoutUtil;
+
     public MovieDetailPresenter(MovieDetailMVP.RequiredViewOps mView) {
         this.mView = new WeakReference<MovieDetailMVP.RequiredViewOps>(mView);
 
@@ -70,6 +93,7 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps,
         thumbnailViewToLoaderMap = new HashMap<>();
 
         thumbnailListener = new ThumbnailListener(thumbnailViewToLoaderMap);
+        layoutUtil = new LayoutUtil(getAppContext());
     }
 
     /**
@@ -99,6 +123,7 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps,
     @Override
     public void onConfigurationChanged(MovieDetailMVP.RequiredViewOps view) {
         setView(view);
+        //configLayout();
     }
 
 
@@ -205,7 +230,29 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps,
         holder.setListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                getView().showToast(ToastMaker.makeToast(getActivityContext() , trailer.getTrailerTitle()));
+
+                String videoId = trailers.get(position).getVieoKey();
+
+                getView().playVideo(videoId);
+
+                /*YoutubeVideoFrgment videoFragment = getView().getVideoContainer();
+                View videoBox = getView().getVideoBox() ;
+                videoFragment.setVideoKey(videoId);
+
+                // The videoBox is INVISIBLE if no video was previously selected, so we need to show it now.
+                if (getView().getVideoBox().getVisibility() != View.VISIBLE) {
+                    if (getActivityContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                        // Initially translate off the screen so that it can be animated in from below.
+
+                        videoBox.setTranslationY(videoBox.getHeight());
+                    }
+                    videoBox.setVisibility(View.VISIBLE);
+                }
+
+                // If the fragment is off the screen, we animate it in.
+                if (videoBox.getTranslationY() > 0) {
+                    videoBox.animate().translationY(0).setDuration(ANIMATION_DURATION_MILLIS);
+                }*/
             }
         });
     }
@@ -213,6 +260,69 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps,
     @Override
     public int getTrailerCount() {
         return trailers.size();
+    }
+
+    @Override
+    public void onClickClose() {
+        getView().getVideoContainer().pause();
+        View videoBox = getView().getVideoBox();
+        ViewPropertyAnimator animator = videoBox.animate()
+                .translationYBy(videoBox.getHeight())
+                .setDuration(ANIMATION_DURATION_MILLIS);
+        runOnAnimationEnd(animator, new Runnable() {
+            @Override
+            public void run() {
+                getView().getVideoBox().setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
+    /**
+     * Sets up the layout programatically for the three different states. Portrait, landscape or
+     * fullscreen+landscape. This has to be done programmatically because we handle the orientation
+     * changes ourselves in order to get fluent fullscreen transitions, so the xml layout resources
+     * do not get reloaded.
+     */
+    @Override
+    public void configLayout() {
+
+        boolean isPortrait =
+                getActivityContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+
+        getView().getTrailerRV().setVisibility(isFullscreen ? View.GONE : View.VISIBLE);
+        getView().getCloseButton().setVisibility(isFullscreen ? View.GONE : View.VISIBLE);
+
+        if (isFullscreen) {
+            getView().getVideoBox().setTranslationY(0); // Reset any translation that was applied in portrait.
+            layoutUtil.setLayoutSize(getView().getVideoContainer().getView(), MATCH_PARENT, MATCH_PARENT);
+            layoutUtil.setLayoutSizeAndGravity(getView().getVideoBox(), MATCH_PARENT, MATCH_PARENT, Gravity.TOP | Gravity.LEFT);
+        } else if (isPortrait) {
+            layoutUtil.setLayoutSize(getView().getTrailerRV(), MATCH_PARENT, MATCH_PARENT);
+            layoutUtil.setLayoutSize(getView().getVideoContainer().getView(), MATCH_PARENT, WRAP_CONTENT);
+            layoutUtil.setLayoutSizeAndGravity(getView().getVideoBox(), MATCH_PARENT, WRAP_CONTENT, Gravity.BOTTOM);
+        } else {
+            getView().getVideoBox().setTranslationY(0); // Reset any translation that was applied in portrait.
+            int screenWidth = layoutUtil.dpTopx(getActivityContext().getResources().getConfiguration().screenWidthDp);
+            layoutUtil.setLayoutSize(getView().getTrailerRV(), screenWidth / 4, MATCH_PARENT);
+            int videoWidth = screenWidth - screenWidth / 4 - layoutUtil.dpTopx(LANDSCAPE_VIDEO_PADDING_DP);
+            layoutUtil.setLayoutSize(getView().getVideoContainer().getView(), videoWidth, WRAP_CONTENT);
+            layoutUtil.setLayoutSizeAndGravity(getView().getVideoBox(), videoWidth, WRAP_CONTENT,
+                    Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+        }
+    }
+
+    @TargetApi(16)
+    private void runOnAnimationEnd(ViewPropertyAnimator animator, final Runnable runnable) {
+        if (Build.VERSION.SDK_INT >= 16) {
+            animator.withEndAction(runnable);
+        } else {
+            animator.setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    runnable.run();
+                }
+            });
+        }
     }
 
     /**
@@ -281,5 +391,12 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps,
         else
             throw new NullPointerException("view is unavailable");
 
+    }
+
+    @Override
+    public void onFullscreen(boolean b) {
+        this.isFullscreen = b ;
+
+        //configLayout();
     }
 }

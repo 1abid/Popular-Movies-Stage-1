@@ -50,9 +50,9 @@ public class RestServiceGenerator  {
          * use this block to know
          * how things are doings
          */
-        /*HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        httpClient.addInterceptor(loggingInterceptor);*/
+        httpClient.addInterceptor(loggingInterceptor);
 
         builder.client(httpClient.build());
         Retrofit retrofit = builder.build();
