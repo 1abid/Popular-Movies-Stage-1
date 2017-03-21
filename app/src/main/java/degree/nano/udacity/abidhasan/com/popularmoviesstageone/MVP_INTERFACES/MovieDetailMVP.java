@@ -2,6 +2,7 @@ package degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -61,6 +62,8 @@ public class MovieDetailMVP {
         TextView getOverViewTv();
         RecyclerView getTrailerRV();
         RecyclerView getReviewRv();
+        FloatingActionButton getFab();
+        MovieGridItem getSelectedMovie();
         String getmovieId();
 
 
@@ -107,6 +110,7 @@ public class MovieDetailMVP {
 
         //youtube video playing
         void onClickClose();
+        void onMovieFbClick();
         void configLayout();
 
     }
@@ -136,5 +140,8 @@ public class MovieDetailMVP {
         void getMovieReviews(String movieId);
 
         int getTrailerItemCount();
+
+
+        void inserMovieToFavoriteList(MovieGridItem item);
     }
 }

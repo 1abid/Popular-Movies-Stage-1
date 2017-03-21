@@ -315,6 +315,12 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
         });
     }
 
+    @Override
+    public void onMovieFbClick() {
+        getView().showToast(ToastMaker.makeToast(getActivityContext()
+                ,"Selected movie : "+ getView().getSelectedMovie().getMovieName()));
+    }
+
     /**
      * Sets up the layout programatically for the three different states. Portrait, landscape or
      * fullscreen+landscape. This has to be done programmatically because we handle the orientation

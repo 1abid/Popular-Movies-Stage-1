@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -42,6 +43,7 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
     private ImageView backDropIv, posterIv;
     public TextView titleTv, ratingTv, releaseDateTv, overViewTv;
     private RecyclerView trailerRv , reviewRv;
+    private FloatingActionButton favoriteMovieFAB;
 
     // Responsible to maintain the object's integrity
     // during configurations change
@@ -67,8 +69,6 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
 
         Bundle extras = getIntent().getExtras();
         selectedMovieItem = getSelectedMovieItem(extras);
-
-        Log.d(getClass().getSimpleName(), "selected movie " + selectedMovieItem.getMovieId());
 
         setUpViews();
 
@@ -121,6 +121,7 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
         ratingTv = (TextView) findViewById(R.id.vote_avg_tv_detail);
         releaseDateTv = (TextView) findViewById(R.id.releaseDate_tv);
         overViewTv = (TextView) findViewById(R.id.overView_tv);
+        favoriteMovieFAB = (FloatingActionButton) findViewById(R.id.fav_movie_fab);
 
         trailerRv = (RecyclerView) findViewById(R.id.trailerRv);
         reviewRv = (RecyclerView) findViewById(R.id.reviewsrRv);
@@ -136,6 +137,13 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
             @Override
             public void onClick(View v) {
                 mPresenter.onClickClose();
+            }
+        });
+
+        favoriteMovieFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPresenter.onMovieFbClick();
             }
         });
 
@@ -319,6 +327,16 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
     @Override
     public RecyclerView getReviewRv() {
         return reviewRv;
+    }
+
+    @Override
+    public FloatingActionButton getFab() {
+        return favoriteMovieFAB;
+    }
+
+    @Override
+    public MovieGridItem getSelectedMovie() {
+        return selectedMovieItem;
     }
 
     @Override
