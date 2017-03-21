@@ -1,5 +1,11 @@
 package degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels;
 
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.data.DAO;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.data.FavoriteMovieContract;
+
 /**
  * Created by VutkaBilai on 2/27/17.
  * mail : la4508@gmail.com
@@ -82,4 +88,6 @@ public class MovieGridItem {
     public void setMovieOverView(String movieOverView) {
         MovieOverView = movieOverView;
     }
+
+
 }

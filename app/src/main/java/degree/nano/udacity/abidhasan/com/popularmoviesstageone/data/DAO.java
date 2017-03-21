@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.provider.ContactsContract;
 import android.util.Log;
 
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
@@ -19,7 +18,8 @@ public class DAO {
     private Context context ;
 
     //SELECTION
-    private static final String SELECT_ID_BASED = FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_MOVIE_ID + " =? ";
+    private static final String SELECT_ID_BASED = FavoriteMovieContract.FavoriteMovieEntry._ID + " =? ";
+    private static final String SELECT_MOVIE_NAME_BASED = FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_MOVIE_NAME + " =? ";
     private static final String PROJECTION_ALL = " * ";
     private static final String SORT_ORDER_DEFAULT = FavoriteMovieContract.FavoriteMovieEntry._ID + " DESC";
 
@@ -41,10 +41,10 @@ public class DAO {
 
     /**
      * add movie to favorite list
-     * @param item
-     * @return
+     *
+     * @param @return
      */
-    private MovieGridItem addMovie(MovieGridItem item){
+    public MovieGridItem insertMovie(MovieGridItem item){
 
         SQLiteDatabase db = getWritDb();
         long id = db.insert(FavoriteMovieContract.FavoriteMovieEntry.TABLE_NAME , null , getMovieItemCV(item));
@@ -57,6 +57,7 @@ public class DAO {
         return insertedItem;
     }
 
+
     public MovieGridItem getMovie(int id){
 
         SQLiteDatabase db = getReadDb();
@@ -67,19 +68,12 @@ public class DAO {
                 null,
                 null,
                 null);
+
         if(c != null){
 
             c.moveToFirst();
 
-            MovieGridItem foundItem = new MovieGridItem();
-            foundItem.setMovieId(c.getInt(c.getColumnIndexOrThrow(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_MOVIE_ID)));
-            foundItem.setMovieAvg_vote(c.getString(c.getColumnIndexOrThrow(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_MOVIE_VOTE_AVG)));
-            foundItem.setMovieName(c.getString(c.getColumnIndexOrThrow(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_MOVIE_NAME)));
-            foundItem.setMovieReleaseDate(c.getString(c.getColumnIndexOrThrow(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_RELEASE_DATE)));
-            foundItem.setMovieTitle(c.getString(c.getColumnIndexOrThrow(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_MOVIE_TITLE)));
-            foundItem.setMovieBackDropPath(c.getString(c.getColumnIndexOrThrow(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_BACKDROP)));
-            foundItem.setMoviePosterPath(c.getString(c.getColumnIndexOrThrow(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_POSTER)));
-            foundItem.setMovieOverView(c.getString(c.getColumnIndexOrThrow(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_OVERVIEW)));
+            MovieGridItem foundItem = getCursorValues(c);
 
             c.close();
             db.close();
@@ -90,6 +84,62 @@ public class DAO {
         }
 
     }
+
+    public long removeMovie(MovieGridItem item){
+
+        SQLiteDatabase db = getWritDb();
+        long res = db.delete(FavoriteMovieContract.FavoriteMovieEntry.TABLE_NAME
+                ,SELECT_MOVIE_NAME_BASED
+                ,new String[]{item.getMovieName()});
+        db.close();
+
+        return res;
+
+    }
+
+
+
+    private MovieGridItem getCursorValues(Cursor c) {
+
+        MovieGridItem foundItem = new MovieGridItem();
+        foundItem.setMovieId(c.getInt(c.getColumnIndexOrThrow(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_MOVIE_ID)));
+        foundItem.setMovieAvg_vote(c.getString(c.getColumnIndexOrThrow(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_MOVIE_VOTE_AVG)));
+        foundItem.setMovieName(c.getString(c.getColumnIndexOrThrow(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_MOVIE_NAME)));
+        foundItem.setMovieReleaseDate(c.getString(c.getColumnIndexOrThrow(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_RELEASE_DATE)));
+        foundItem.setMovieTitle(c.getString(c.getColumnIndexOrThrow(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_MOVIE_TITLE)));
+        foundItem.setMovieBackDropPath(c.getString(c.getColumnIndexOrThrow(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_BACKDROP)));
+        foundItem.setMoviePosterPath(c.getString(c.getColumnIndexOrThrow(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_POSTER)));
+        foundItem.setMovieOverView(c.getString(c.getColumnIndexOrThrow(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_NAME_OVERVIEW)));
+
+        return foundItem;
+    }
+
+    public boolean isAlreadyInserted(String movieName){
+
+        boolean alreadyAdded = false ;
+
+        SQLiteDatabase db = getReadDb();
+        Cursor c = db.query(FavoriteMovieContract.FavoriteMovieEntry.TABLE_NAME,
+                null,
+                SELECT_MOVIE_NAME_BASED,
+                new String[]{movieName},
+                null,
+                null,
+                null);
+
+        if(c != null && c.moveToFirst()){
+
+            MovieGridItem item = getCursorValues(c);
+            alreadyAdded = true ;
+            Log.d(getClass().getSimpleName() , "already inserted.."+alreadyAdded);
+            c.close();
+            db.close();
+
+        }
+
+        return alreadyAdded;
+    }
+
 
     private ContentValues getMovieItemCV(MovieGridItem item){
         ContentValues cv = new ContentValues();

@@ -7,9 +7,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Build;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +37,8 @@ import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.Mo
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.adapters.ReviewAdapter;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.adapters.TrailerAdpter;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.data.DAO;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.data.FavoriteMovieDataSchema;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.interfaces.OnItemClickListener;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.movieReviewsModel.Reviews;
@@ -45,6 +49,7 @@ import degree.nano.udacity.abidhasan.com.popularmoviesstageone.view.ReviewViewHo
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static degree.nano.udacity.abidhasan.com.popularmoviesstageone.R.drawable.ic_favorite_border;
 
 /**
  * Created by abidhasan on 3/6/17.
@@ -63,7 +68,6 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
 
     private TrailerAdpter trailerAdpter;
     private ReviewAdapter reviewAdapter;
-
 
 
     /**youtube video loading**/
@@ -174,21 +178,41 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
     }
 
     @Override
-    public void onTrailerDownload(ArrayList<MovieTrailer> trailerArrayList ,ArrayList<Reviews> reviewsArrayList) {
+    public void onTrailerDownload(ArrayList<MovieTrailer> trailerArrayList, ArrayList<Reviews> reviewsArrayList) {
 
         trailers = trailerArrayList;
         reviewes = reviewsArrayList;
 
         trailerAdpter = new TrailerAdpter(this);
-        RecyclerView trailerRv = InitializeRv(getView().getTrailerRV() , LinearLayoutManager.HORIZONTAL);
+        RecyclerView trailerRv = InitializeRv(getView().getTrailerRV(), LinearLayoutManager.HORIZONTAL);
         trailerRv.setAdapter(trailerAdpter);
 
         reviewAdapter = new ReviewAdapter(this);
-        RecyclerView reviewRv = InitializeRv(getView().getReviewRv() ,LinearLayoutManager.VERTICAL);
+        RecyclerView reviewRv = InitializeRv(getView().getReviewRv(), LinearLayoutManager.VERTICAL);
         reviewRv.setAdapter(reviewAdapter);
+
+        changeFABState(mModel.isAlreadyFaved(getView().getSelectedMovie()));
+
     }
 
-    private RecyclerView InitializeRv(RecyclerView rv , int orientation) {
+    @Override
+    public void changeFABState(boolean faved) {
+
+        Log.d(getClass().getSimpleName() , "movie faved "+faved);
+
+        FloatingActionButton fab = getView().getFab();
+        if (faved)
+            fab.setImageResource(R.drawable.ic_favorite);
+        else
+            fab.setImageResource(R.drawable.ic_favorite_border);
+    }
+
+    @Override
+    public void onMovieLiked(MovieGridItem item) {
+        mModel.insertMovieToFavoriteList(item);
+    }
+
+    private RecyclerView InitializeRv(RecyclerView rv, int orientation) {
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivityContext(), orientation, false);
         rv.setLayoutManager(layoutManager);
@@ -200,7 +224,6 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
 
         return rv;
     }
-
 
 
     @Override
@@ -317,8 +340,7 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
 
     @Override
     public void onMovieFbClick() {
-        getView().showToast(ToastMaker.makeToast(getActivityContext()
-                ,"Selected movie : "+ getView().getSelectedMovie().getMovieName()));
+        mModel.insertMovieToFavoriteList(getView().getSelectedMovie());
     }
 
     /**

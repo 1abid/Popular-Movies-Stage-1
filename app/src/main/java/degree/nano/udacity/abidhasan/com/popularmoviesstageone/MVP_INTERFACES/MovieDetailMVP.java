@@ -100,6 +100,7 @@ public class MovieDetailMVP {
         void onTrailerDownload(ArrayList<MovieTrailer> trailerArrayList , ArrayList<Reviews> reviewsArrayList);
 
 
+
         MovieTrailerViewHolder createTrailerViewHolder(ViewGroup parent , int viewType);
         void bindTrailerViewHolder(MovieTrailerViewHolder holder , int position);
         int getTrailerCount();
@@ -108,7 +109,7 @@ public class MovieDetailMVP {
         void bindReviewViewHolder(ReviewViewHolder holder , int position);
         int getReviewCount();
 
-        //youtube video playing
+
         void onClickClose();
         void onMovieFbClick();
         void configLayout();
@@ -123,6 +124,8 @@ public class MovieDetailMVP {
     public interface RequiredPresenterOps{
         Context getAppContext();
         Context getActivityContext();
+        void onMovieLiked(MovieGridItem item);
+        public void changeFABState(boolean faved);
     }
 
 
@@ -142,6 +145,7 @@ public class MovieDetailMVP {
         int getTrailerItemCount();
 
 
-        void inserMovieToFavoriteList(MovieGridItem item);
+        void insertMovieToFavoriteList(MovieGridItem item);
+        boolean isAlreadyFaved(MovieGridItem item);
     }
 }
