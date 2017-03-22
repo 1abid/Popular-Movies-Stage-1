@@ -1,11 +1,13 @@
 package degree.nano.udacity.abidhasan.com.popularmoviesstageone.model;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Application.RestServiceGenerator;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ToastMaker;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.PopularMoviesMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.data.DAO;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.Movie;
@@ -49,14 +51,17 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
 
         popularMovies = new ArrayList<>() ;
         topRatedMovies = new ArrayList<>() ;
-        favedMovies = new ArrayList<>();
 
+        mDao = new DAO(mPresenter.getActivityContext());
     }
 
     @Override
     public void onDestroy(boolean isConfigurationChanging) {
-        if(!isConfigurationChanging)
-            mPresenter = null ;
+        if(!isConfigurationChanging) {
+            mPresenter = null;
+            mDao = null ;
+            favedMovies = null;
+        }
     }
 
     @Override
@@ -219,6 +224,12 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
     @Override
     public boolean loadFavedMovies() {
 
-        return false;
+        favedMovies = mDao.getAllMovies();
+        return favedMovies!=null;
+    }
+
+    @Override
+    public MovieGridItem getAMovieItem(int position) {
+        return favedMovies.get(position);
     }
 }

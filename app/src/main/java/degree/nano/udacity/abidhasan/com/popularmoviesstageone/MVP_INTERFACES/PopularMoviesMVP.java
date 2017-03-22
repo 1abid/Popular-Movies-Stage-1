@@ -65,6 +65,10 @@ public class PopularMoviesMVP {
         void bindTopratedViewHolder(MovieViewHolder holder , int position);
         int getTopRatedItemCount();
 
+        MovieViewHolder createFavoriteViewHolder(ViewGroup parent , int viewType);
+        void bindFavoriteViewHolder(MovieViewHolder holder , int position);
+        int getFavoriteItemCount();
+
         void setProgressDialogMsg(String msg , ProgressDialog progressDialog);
         void loadPopularMovies();
         void loadTopRatedMovies();
@@ -101,5 +105,6 @@ public class PopularMoviesMVP {
         List<MovieGridItem> generatePopularMovieGridItems();
         List<MovieGridItem> generateTopRatedMovieGridItems();
         boolean loadFavedMovies();
+        MovieGridItem getAMovieItem(int position);
     }
 }

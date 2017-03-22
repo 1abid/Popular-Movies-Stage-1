@@ -2,6 +2,7 @@ package degree.nano.udacity.abidhasan.com.popularmoviesstageone.presenter;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -24,6 +25,7 @@ import java.util.List;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Common.ToastMaker;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.PopularMoviesMVP;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.R;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.adapters.FavoriteMovieAdapter;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.adapters.PopularMovieAdapter;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.adapters.TopRatedMovieAdapter;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.interfaces.OnItemClickListener;
@@ -157,11 +159,13 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
     @Override
     public void loadFavoriteMovies() {
+
         if(mModel.loadFavedMovies()){
-            //TODO show moies in a recylerView
-        }else {
-            //TODO no movie has been added to fav list
+            getView().getRecyclrView().setAdapter(new FavoriteMovieAdapter(this));
+        }else{
+            //TODO show a textview about empty favorite movie list
         }
+
     }
 
 
@@ -185,7 +189,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
             addTopRatedMoviesGridItem();
 
         topRatedMovieAdapter = new TopRatedMovieAdapter(this);
-        getView().getRecyclrView().swapAdapter(topRatedMovieAdapter, true);
+        getView().getRecyclrView().setAdapter(topRatedMovieAdapter);
         topRatedMovieAdapter.notifyDataSetChanged();
 
     }
@@ -307,6 +311,28 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     @Override
     public int getTopRatedItemCount() {
         return mTopRatedMovies.size();
+    }
+
+    @Override
+    public MovieViewHolder createFavoriteViewHolder(ViewGroup parent, int viewType) {
+        MovieViewHolder viewHolder;
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+
+        View movieItem = inflater.inflate(R.layout.movie_item, parent, false);
+        viewHolder = new MovieViewHolder(movieItem);
+
+        return viewHolder;
+    }
+
+    @Override
+    public void bindFavoriteViewHolder(MovieViewHolder holder, int position) {
+        MovieGridItem movieItem = mModel.getAMovieItem(position);
+        bindMovieData(holder, movieItem);
+    }
+
+    @Override
+    public int getFavoriteItemCount() {
+        return mModel.getFavedMovieListSize();
     }
 
 
