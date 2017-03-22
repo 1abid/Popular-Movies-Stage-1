@@ -68,11 +68,11 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
         showPopularMovies(getSortType());
     }
 
-    private String getSortType(){
+    private String getSortType() {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivityContext());
 
-        return sharedPreferences.getString(getString(R.string.sort_key) , "1");
+        return sharedPreferences.getString(getString(R.string.sort_key), "1");
     }
 
     /**
@@ -85,12 +85,19 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
             if ("1".equals(sortID)) {
                 Log.d(getClass().getSimpleName(), "popular selected");
                 mPresenter.loadPopularMovies();
-            } else {
-                Log.d(getClass().getSimpleName(), "Toprated selected");
+            } else if ("2".equals(sortID)) {
+                Log.d(getClass().getSimpleName(), "Top rated selected");
                 mPresenter.loadTopRatedMovies();
+            } else {
+                Log.d(getClass().getSimpleName(), "Favorite selected");
+                mPresenter.loadFavoriteMovies();
             }
-        } else
-            showToast(ToastMaker.makeToast(getActivityContext(), " No internetConnection !"));
+        } else {
+            if ("3".equals(sortID))
+                mPresenter.loadFavoriteMovies();
+            else
+                showToast(ToastMaker.makeToast(getActivityContext(), " No internetConnection !"));
+        }
     }
 
 
@@ -147,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements PopularMoviesMVP.
         switch (item.getItemId()) {
 
             case R.id.setting_menu:
-                startActivity(new Intent(this , SettingsActivity.class));
+                startActivity(new Intent(this, SettingsActivity.class));
                 return true;
 
             default:

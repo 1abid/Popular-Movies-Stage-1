@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
@@ -67,6 +68,7 @@ public class PopularMoviesMVP {
         void setProgressDialogMsg(String msg , ProgressDialog progressDialog);
         void loadPopularMovies();
         void loadTopRatedMovies();
+        void loadFavoriteMovies();
 
 
     }
@@ -94,8 +96,10 @@ public class PopularMoviesMVP {
 
         int getPopularMoviesListSize();
         int getTopRatedMoviesListSize();
+        int getFavedMovieListSize();
 
         List<MovieGridItem> generatePopularMovieGridItems();
         List<MovieGridItem> generateTopRatedMovieGridItems();
+        boolean loadFavedMovies();
     }
 }

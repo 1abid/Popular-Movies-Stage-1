@@ -155,6 +155,15 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
             showTopRatedMovies();
     }
 
+    @Override
+    public void loadFavoriteMovies() {
+        if(mModel.loadFavedMovies()){
+            //TODO show moies in a recylerView
+        }else {
+            //TODO no movie has been added to fav list
+        }
+    }
+
 
     public void showPopularMovies() {
 

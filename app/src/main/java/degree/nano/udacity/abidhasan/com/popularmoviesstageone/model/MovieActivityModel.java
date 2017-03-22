@@ -7,6 +7,7 @@ import java.util.List;
 
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Application.RestServiceGenerator;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.MVP_INTERFACES.PopularMoviesMVP;
+import degree.nano.udacity.abidhasan.com.popularmoviesstageone.data.DAO;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.Movie;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.PopularMovieResponse;
@@ -31,10 +32,12 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
 
     private List<MovieGridItem> popularMovieGridItems;
     private List<MovieGridItem> topRatedMoviesGridItems;
+    private List<MovieGridItem> favedMovies;
 
     private List<Movie> popularMovies ;
     private List<Movie> topRatedMovies ;
 
+    private DAO mDao;
 
     public MovieActivityModel(PopularMoviesMVP.RequiredPresenterOps mPresenter) {
         this.mPresenter = mPresenter;
@@ -46,6 +49,8 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
 
         popularMovies = new ArrayList<>() ;
         topRatedMovies = new ArrayList<>() ;
+        favedMovies = new ArrayList<>();
+
     }
 
     @Override
@@ -133,6 +138,11 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
         return (topRatedMovies == null ) ? 0 : topRatedMovies.size();
     }
 
+    @Override
+    public int getFavedMovieListSize() {
+        return favedMovies.size()==0 ? 0 : favedMovies.size();
+    }
+
 
     /**
      * generate popular movie grid item
@@ -204,5 +214,11 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
         }
 
         return topRatedMoviesGridItems;
+    }
+
+    @Override
+    public boolean loadFavedMovies() {
+
+        return false;
     }
 }

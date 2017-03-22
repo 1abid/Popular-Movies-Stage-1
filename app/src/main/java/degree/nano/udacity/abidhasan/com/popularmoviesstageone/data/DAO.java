@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.model.PopularTopRatedMovieModels.MovieGridItem;
 
 /**
@@ -83,6 +85,38 @@ public class DAO {
             return null ;
         }
 
+    }
+
+    public ArrayList<MovieGridItem> getAllMovies(){
+
+        SQLiteDatabase db = getReadDb();
+
+        ArrayList<MovieGridItem> allFavoritedMovies = new ArrayList<>();
+
+        Cursor c = db.query(FavoriteMovieContract.FavoriteMovieEntry.TABLE_NAME,
+                null ,
+                null ,
+                null ,
+                null ,
+                null ,
+                null );
+
+        if(c != null && c.moveToFirst()){
+
+            while (!c.isAfterLast()){
+                MovieGridItem foundMovie = getCursorValues(c) ;
+
+                allFavoritedMovies.add(foundMovie);
+                c.moveToNext();
+            }
+
+            c.close();
+            db.close();
+
+            return allFavoritedMovies;
+        }else {
+            return null ;
+        }
     }
 
     public long removeMovie(MovieGridItem item){
