@@ -51,6 +51,7 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
 
         popularMovies = new ArrayList<>() ;
         topRatedMovies = new ArrayList<>() ;
+        favedMovies = new ArrayList<>();
 
         mDao = new DAO(mPresenter.getActivityContext());
     }
@@ -145,7 +146,7 @@ public class MovieActivityModel implements PopularMoviesMVP.ProvidedModelOps {
 
     @Override
     public int getFavedMovieListSize() {
-        return favedMovies.size()==0 ? 0 : favedMovies.size();
+        return favedMovies.size() == 0 ? 0 : favedMovies.size();
     }
 
 

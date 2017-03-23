@@ -147,5 +147,8 @@ public class MovieDetailMVP {
 
         void insertMovieToFavoriteList(MovieGridItem item);
         boolean isAlreadyFaved(MovieGridItem item);
+
+        ArrayList<MovieTrailer> getTrailers(int movieId);
+        ArrayList<Reviews> getReviews(int movieId);
     }
 }

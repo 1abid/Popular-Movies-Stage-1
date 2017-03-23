@@ -5,9 +5,11 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -164,8 +166,6 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
     @Override
     public void loadMovieDetail(MovieGridItem movie) {
 
-        setProgressDialogMsg("Loading...");
-        getView().showProgressDialog();
 
         getView().getTitleTv().setText(movie.getMovieTitle());
         getView().getRatingTv().setText(movie.getMovieAvg_vote());
@@ -174,7 +174,34 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
         loadImage(getView().getBackdropImageView(), movie.getMovieBackDropPath());
         loadImage(getView().getPosterImageView(), movie.getMoviePosterPath());
 
-        mModel.getMovieTrailers(getView().getmovieId());
+        if ("3".equals(getSortType())) {
+            ArrayList<MovieTrailer> trailersList = getTrailers(getView().getSelectedMovie());
+            ArrayList<Reviews> reviewList = getReviewes(getView().getSelectedMovie());
+
+            onTrailerDownload(trailersList, reviewList);
+        } else {
+
+            setProgressDialogMsg("Loading...");
+            getView().showProgressDialog();
+            mModel.getMovieTrailers(getView().getmovieId());
+        }
+    }
+
+    private ArrayList<MovieTrailer> getTrailers(MovieGridItem item) {
+
+        return mModel.getTrailers(item.getMovieId());
+    }
+
+    private ArrayList<Reviews> getReviewes(MovieGridItem item) {
+
+        return mModel.getReviews(item.getMovieId());
+    }
+
+    private String getSortType() {
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivityContext());
+
+        return sharedPreferences.getString(getActivityContext().getString(R.string.sort_key), "1");
     }
 
     @Override
@@ -198,7 +225,7 @@ public class MovieDetailPresenter implements MovieDetailMVP.ProviedPresenterOps
     @Override
     public void changeFABState(boolean faved) {
 
-        Log.d(getClass().getSimpleName() , "movie faved "+faved);
+        Log.d(getClass().getSimpleName(), "movie faved " + faved);
 
         FloatingActionButton fab = getView().getFab();
         if (faved)

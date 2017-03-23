@@ -32,13 +32,27 @@ public class MovieTrailer {
     @SerializedName("type")
     private String type;
 
-
-    public MovieTrailer(String id, String vieoKey, String trailerTitle, String site, int size, String type) {
+    public void setId(String id) {
         this.id = id;
+    }
+
+    public void setVieoKey(String vieoKey) {
         this.vieoKey = vieoKey;
+    }
+
+    public void setTrailerTitle(String trailerTitle) {
         this.trailerTitle = trailerTitle;
+    }
+
+    public void setSite(String site) {
         this.site = site;
+    }
+
+    public void setSize(int size) {
         this.size = size;
+    }
+
+    public void setType(String type) {
         this.type = type;
     }
 

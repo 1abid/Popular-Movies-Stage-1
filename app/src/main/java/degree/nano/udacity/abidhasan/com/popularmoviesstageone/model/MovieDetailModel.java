@@ -3,6 +3,7 @@ package degree.nano.udacity.abidhasan.com.popularmoviesstageone.model;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import degree.nano.udacity.abidhasan.com.popularmoviesstageone.Application.RestServiceGenerator;
@@ -132,17 +133,61 @@ public class MovieDetailModel implements MovieDetailMVP.ProvidedModelOps {
     public void insertMovieToFavoriteList(MovieGridItem item) {
         if(!mDao.isAlreadyInserted(item.getMovieName())){
             mDao.insertMovie(item);
+            saveMovieTrilers(item.getMovieId());
+            saveMovieReviews(item.getMovieId());
             mPresenter.changeFABState(true);
         }else {
 
             Log.d(getClass().getSimpleName() , "deleted "+mDao.removeMovie(item));
+
+            removeTrialers();
+            removeReviews();
+
             mPresenter.changeFABState(false);
+        }
+    }
+
+    private void removeTrialers() {
+        for (MovieTrailer trailer :
+                trailerList) {
+            mDao.removeTrailer(trailer.getId());
+        }
+    }
+
+    private void saveMovieTrilers(int movieId) {
+        for (MovieTrailer trailer :
+             trailerList) {
+            mDao.insertMovieTriler(trailer,movieId);
+        }
+    }
+
+    private void removeReviews() {
+        for (Reviews review :
+                reviewList) {
+            mDao.removeReview(review.getId());
+        }
+    }
+
+    private void saveMovieReviews(int movieId) {
+        for (Reviews review :
+                reviewList) {
+            mDao.insertMovieReview(review,movieId);
         }
     }
 
     @Override
     public boolean isAlreadyFaved(MovieGridItem item) {
         return mDao.isAlreadyInserted(item.getMovieName()) ? true : false ;
+    }
+
+    @Override
+    public ArrayList<MovieTrailer> getTrailers(int movieID) {
+        return mDao.getTrilers(movieID);
+    }
+
+    @Override
+    public ArrayList<Reviews> getReviews(int movieID) {
+        return mDao.getReviews(movieID);
     }
 
 

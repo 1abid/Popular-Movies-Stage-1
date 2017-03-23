@@ -56,6 +56,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
 
     private PopularMovieAdapter popularMovieadpter;
     private TopRatedMovieAdapter topRatedMovieAdapter;
+    private FavoriteMovieAdapter favoriteMovieAdapter;
 
     private List<MovieGridItem> mPopularMovies;
     private List<MovieGridItem> mTopRatedMovies;
@@ -160,10 +161,13 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     @Override
     public void loadFavoriteMovies() {
 
-        if(mModel.loadFavedMovies()){
-            getView().getRecyclrView().setAdapter(new FavoriteMovieAdapter(this));
-        }else{
-            //TODO show a textview about empty favorite movie list
+
+        if (mModel.loadFavedMovies()) {
+            favoriteMovieAdapter = new FavoriteMovieAdapter(this);
+            getView().getRecyclrView().setAdapter(favoriteMovieAdapter);
+        } else {
+
+            getView().showToast(ToastMaker.makeToast(getActivityContext(), " no movie has been favorited yet"));
         }
 
     }
@@ -195,7 +199,7 @@ public class MoviePresenter implements PopularMoviesMVP.RequiredPresenterOps
     }
 
     @Override
-    public void initializeRecyclerView(){
+    public void initializeRecyclerView() {
 
         RecyclerView movieRV = getView().getRecyclrView();
 
